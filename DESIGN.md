@@ -79,7 +79,11 @@ Uses the Aceternity Apple cards carousel track with three static local step card
 
 ### `LoginPage`
 
-Provides the `/login` destination for reservation intent until authentication is connected. It keeps the return path obvious and reports that login is demo-only when the placeholder form is submitted.
+Provides the `/login` destination for reservation intent until authentication is connected. The page uses a spacious split layout: a focused sign-in/sign-up task on the left and an event-led visual field on the right. `AuthForm` owns the mode switch, social/email presentation, native validation with inline invalid-field messages, live demo feedback, an explicit no-session disclosure, and the return action. `AuthVisualPanel` defaults to event photography and exposes `event`, `city`, and `signal` treatments through accessible pressed-state controls. The visual field hides below the tablet breakpoint so the auth task stays short, primary, and free from a clipped split grid.
+
+### `AuthForm` and `AuthVisualPanel`
+
+The auth primitives use the existing Ventra palette and typography rather than introducing a separate authentication theme. Sign-in copy is `Keep your next plan close.` and sign-up copy is `Make room for a good plan.`. Google and email actions are intentionally demo-only; the form states this directly, validates invalid fields inline, and valid submissions show local status feedback without creating sessions, calling providers, or persisting credentials. Auth heading sizes use fixed type steps at responsive breakpoints so the composition stays stable instead of scaling with viewport width.
 
 ### `CreateEventDrawer`
 
@@ -120,6 +124,8 @@ Compose three linked wheel columns for dates (`weekday`, `day`, `month`) and tim
 - Detail dialogs support Escape, outside click, and a focusable close button.
 - Browse event cards open from their full surface and expose a keyboard activation path.
 - Reserve event routes to the login destination without pretending to complete authentication.
+- Login supports sign-in/sign-up switching, native required/email validation with inline messages, a visible focus path, and an `aria-live` demo status without implying a connected provider.
+- The auth visual selector uses `aria-pressed` controls and remains available for design exploration on desktop; the visual panel is hidden on mobile.
 - The create form keeps validation inline and the upload surface supports keyboard activation through the dropzone control.
 - Date and time wheels expose listbox options with selected state and keyboard movement; no manual date or time text fields are required.
 - Mobile layouts keep the page and dialog within the viewport width; horizontal overflow is limited to the intentionally scrollable Apple card track.

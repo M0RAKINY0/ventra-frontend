@@ -1,12 +1,32 @@
-import { ArrowLeft, ArrowUpRight, Route } from "lucide-react"
-import { useState } from "react"
+import { ArrowLeft, Route } from "lucide-react"
+import { useState, type FormEvent } from "react"
+import { AuthForm } from "@/components/auth/AuthForm"
+import { AuthVisualPanel } from "@/components/auth/AuthVisualPanel"
+import type { AuthMode } from "@/types/auth"
+import type { Event } from "@/types/events"
 
 type LoginPageProps = {
+  featuredEvent: Event
   onBack: () => void
 }
 
-export function LoginPage({ onBack }: LoginPageProps) {
-  const [submitted, setSubmitted] = useState(false)
+export function LoginPage({ featuredEvent, onBack }: LoginPageProps) {
+  const [mode, setMode] = useState<AuthMode>("sign-in")
+  const [status, setStatus] = useState<string | null>(null)
+
+  const handleModeChange = (nextMode: AuthMode) => {
+    setMode(nextMode)
+    setStatus(null)
+  }
+
+  const handleDemoSubmit = () => {
+    setStatus(mode === "sign-in" ? "You are back in. Your plans are ready." : "Your Ventra account is ready in this demo.")
+  }
+
+  const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
+    submitEvent.preventDefault()
+    handleDemoSubmit()
+  }
 
   return (
     <div className="events-app login-view" id="top">
@@ -27,40 +47,19 @@ export function LoginPage({ onBack }: LoginPageProps) {
       </header>
 
       <main className="login-main">
-        <section aria-labelledby="login-title" className="login-panel">
-          <p className="eyebrow">Your plans, together</p>
-          <h1 id="login-title">Log in to keep your spot.</h1>
-          <p className="login-intro">
-            Sign in to keep your plans together and reserve the next one in a few taps.
-          </p>
-          <form
-            className="login-form"
-            onSubmit={(submitEvent) => {
-              submitEvent.preventDefault()
-              setSubmitted(true)
-            }}
-          >
-            <label className="login-field" htmlFor="login-email">
-              Email address
-              <input autoComplete="email" id="login-email" required type="email" />
-            </label>
-            <label className="login-field" htmlFor="login-password">
-              Password
-              <input autoComplete="current-password" id="login-password" required type="password" />
-            </label>
-            <button className="primary-button login-submit" type="submit">
-              Continue to your plans <ArrowUpRight aria-hidden="true" size={16} />
-            </button>
-          </form>
-          {submitted ? (
-            <p className="login-status" role="status">
-              Login is not connected in this demo yet, but your plan is still here.
-            </p>
-          ) : null}
-          <button className="secondary-button login-return" onClick={onBack} type="button">
-            Keep browsing <ArrowLeft aria-hidden="true" size={16} />
-          </button>
-        </section>
+        <div className="login-layout">
+          <section aria-labelledby="auth-form-title" className="auth-form-panel">
+            <AuthForm
+              mode={mode}
+              onBack={onBack}
+              onModeChange={handleModeChange}
+              onSocialSubmit={handleDemoSubmit}
+              onSubmit={handleSubmit}
+              status={status}
+            />
+          </section>
+          <AuthVisualPanel event={featuredEvent} />
+        </div>
       </main>
     </div>
   )

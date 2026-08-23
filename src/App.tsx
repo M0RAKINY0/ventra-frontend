@@ -41,7 +41,7 @@ function App() {
   const handleReserve = () => navigateTo("/login")
 
   if (pathname === "/login") {
-    return <LoginPage onBack={() => navigateTo("/")} />
+    return <LoginPage featuredEvent={events[0] ?? demoEvents[0]} onBack={() => navigateTo("/")} />
   }
 
   return (
