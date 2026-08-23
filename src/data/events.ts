@@ -70,7 +70,7 @@ export const demoEvents: Event[] = [
 export const howItWorksSteps: HowItWorksStep[] = [
   {
     id: "discover",
-    stepLabel: "01 / Discover",
+    stepLabel: "Discover",
     title: "Find a plan that fits your day",
     description:
       "Scan the hero for what is happening now, then browse a fuller list when you want more choice.",
@@ -79,7 +79,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
   },
   {
     id: "details",
-    stepLabel: "02 / Details",
+    stepLabel: "Details",
     title: "Open the details before you commit",
     description:
       "Every event keeps the practical bits together: time, place, price, and the feeling of the room.",
@@ -88,7 +88,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
   },
   {
     id: "create",
-    stepLabel: "03 / Create",
+    stepLabel: "Create",
     title: "Put your own plan on the map",
     description:
       "Share the next gathering with a clear image and the details people need to show up.",

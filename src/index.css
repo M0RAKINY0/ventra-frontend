@@ -1,29 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f8fb;
-  --foreground: #122033;
-  --card: #ffffff;
-  --card-foreground: #122033;
-  --popover: #ffffff;
-  --popover-foreground: #122033;
-  --primary: #2758f2;
-  --primary-foreground: #ffffff;
-  --secondary: #e8f6e8;
-  --secondary-foreground: #22632d;
-  --muted: #edf1f6;
-  --muted-foreground: #607086;
-  --accent: #ff754f;
-  --accent-foreground: #30160c;
-  --destructive: #c93c4a;
-  --border: #dbe3ee;
-  --input: #dbe3ee;
-  --ring: #2758f2;
-  --radius: 0.5rem;
-  --shadow-soft: 0 24px 70px rgba(36, 61, 99, 0.13);
-  --shadow-card: 0 10px 32px rgba(36, 61, 99, 0.09);
-  --font-sans: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
-  --font-display: "Space Grotesk", "Trebuchet MS", Arial, sans-serif;
+  --background: #eef1eb;
+  --foreground: #17231f;
+  --card: #fffdf7;
+  --card-foreground: #17231f;
+  --popover: #fffdf7;
+  --popover-foreground: #17231f;
+  --primary: #2148d8;
+  --primary-foreground: #fffdf7;
+  --secondary: #e4efc9;
+  --secondary-foreground: #234528;
+  --muted: #dfe6dd;
+  --muted-foreground: #5e6f68;
+  --accent: #f36c42;
+  --accent-foreground: #32180f;
+  --destructive: #bf4438;
+  --border: #cad6cb;
+  --input: #c6d1c8;
+  --ring: #2148d8;
+  --radius: 0.35rem;
+  --route-paper: #f6f7f1;
+  --route-paper-deep: #e9eee7;
+  --route-grid: #c9d6ca;
+  --route-ink: #17231f;
+  --route-ink-soft: #5e6f68;
+  --route-cobalt: #2148d8;
+  --route-cobalt-dark: #1737b8;
+  --route-tangerine: #f36c42;
+  --route-leaf: #a8d56f;
+  --route-lime: #e4efc9;
+  --route-white: #fffdf7;
+  --shadow-soft: 0 20px 60px rgba(35, 53, 45, 0.11);
+  --shadow-card: 0 12px 24px rgba(35, 53, 45, 0.12);
+  --font-sans: "DM Sans", "Segoe UI", Arial, sans-serif;
+  --font-display: "Archivo Black", "Arial Black", "Segoe UI", sans-serif;
+  --font-mono: "Space Mono", "Cascadia Mono", Consolas, monospace;
   font-family: var(--font-sans);
   color: var(--foreground);
   background: var(--background);
@@ -105,7 +117,7 @@ img {
 }
 
 ::selection {
-  color: #ffffff;
+  color: var(--route-white);
   background: var(--primary);
 }
 

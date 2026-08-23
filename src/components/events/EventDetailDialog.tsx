@@ -2,10 +2,8 @@ import { X } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useCallback, useEffect, useId, useRef } from "react"
 import { useOutsideClick } from "@/hooks/use-outside-click"
-import { EventBadge } from "@/components/events/EventBadge"
 import { EventMedia } from "@/components/events/EventMedia"
 import { EventMeta } from "@/components/events/EventMeta"
-import { eventBadgeTone } from "@/components/events/event-badge-tone"
 import type { Event } from "@/types/events"
 
 type EventDetailDialogProps = {
@@ -68,7 +66,6 @@ export function EventDetailDialog({ event, onClose, onReserve }: EventDetailDial
               >
                 <X aria-hidden="true" size={17} />
               </button>
-              <EventBadge tone={eventBadgeTone(event.category)}>{event.category}</EventBadge>
               <h3 id={titleId}>{event.title}</h3>
               <p className="event-detail-description">{event.description}</p>
               <EventMeta className="event-detail-meta" event={event} includePrice />

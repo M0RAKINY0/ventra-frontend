@@ -1,6 +1,6 @@
 # Ventra Frontend
 
-Ventra Frontend is the client-only Vite + React + TypeScript event-discovery app. It presents local demo plans, opens event details, explains the browse-to-create journey, and lets a user publish an event with an image preview. New events live in memory and intentionally reset on refresh.
+Ventra Frontend is the client-only Vite + React + TypeScript event-discovery app. This `inviting-baseline` branch keeps the previous landing-page composition while applying the current Ventra logo, voice, palette, typography, and footer treatment for visual comparison. It presents local demo plans, opens event details, explains the browse-to-create journey, and lets a user publish an event with an image preview. New events live in memory and intentionally reset on refresh.
 
 ## Stack
 
@@ -34,10 +34,14 @@ npm run build
 - `src/components/events/` contains the extracted event primitives and feature adapters, including the shared create form and compact wheel pickers.
 - `src/components/ui/` contains shadcn and Aceternity-derived primitives.
 - `public/events/` contains local demo photography so the experience does not depend on a remote image service.
-- `DESIGN.md` records the visual system after verification.
+- `DESIGN.md` records the visual system used by this comparison branch.
 
 Event details open from the full browse-card surface and use a shared blurred dialog. The Reserve event action routes to `/login`; authentication is intentionally not connected yet. The How it works cards remain static while their Apple carousel track stays horizontally navigable. The `Put it on the map` section renders the reusable create form inline, while the header and hero shortcuts open the same form in a drawer. The hero media stack stays contained inside its white frame, and the create form pairs related fields to keep the interface compact.
 
 ## Image Upload
 
 The create form accepts one JPEG, PNG, or WebP image up to 5 MB. Dates and times are selected with compact iOS-inspired wheel controls rather than typed manually; the date month wheel shows each available month once and keeps its selected day linked. The preview uses a local object URL, supports replacement and removal, and is owned by the in-memory event after publish. There is no backend or persistent storage in this slice.
+
+## Comparison Branch
+
+The `inviting-baseline` branch is intentionally separate from the `redesign` route-board branch. It is a preview branch for evaluating the current Ventra colors, fonts, and footer on the earlier landing-page layout; it is not intended to merge the two page structures automatically.

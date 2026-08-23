@@ -1,4 +1,4 @@
-import { ArrowDown, Plus } from "lucide-react"
+import { ArrowDown, ArrowUpRight, Plus, Route } from "lucide-react"
 import { useEffect, useState } from "react"
 import "./App.css"
 import { AnimatedEventHero } from "@/components/events/AnimatedEventHero"
@@ -46,28 +46,34 @@ function App() {
 
   return (
     <div className="events-app" id="top">
-      <header className="site-header">
-        <div className="nav-wrap">
-          <a className="brand-lockup" href="#top" aria-label="Events home">
-            <span aria-hidden="true" className="brand-mark" />
-            <span>Events</span>
+      <header className="site-header route-site-header">
+        <div className="nav-wrap route-header-inner">
+          <a className="route-brand-lockup" href="#top" aria-label="Ventra home">
+            <span aria-hidden="true" className="route-brand-mark">
+              <Route size={18} />
+            </span>
+            <span className="route-brand-name">Ventra</span>
+            <span className="route-brand-tag">A city guide</span>
           </a>
-          <nav aria-label="Primary navigation" className="nav-links">
-            <a className="nav-link" href="#browse-plans">
-              Browse plans
+          <nav aria-label="Primary navigation" className="route-nav">
+            <a className="route-nav-link" href="#browse-plans">
+              Browse
             </a>
-            <a className="nav-link" href="#how-it-works">
+            <a className="route-nav-link" href="#how-it-works">
               How it works
             </a>
+            <a className="route-nav-link" href="#create-event">
+              Create
+            </a>
             <button
-              aria-label="Create event"
-              className="nav-create"
+              aria-label="Create an event"
+              className="route-nav-create"
               onClick={() => setIsCreateOpen(true)}
-              title="Create event"
+              title="Create an event"
               type="button"
             >
               <Plus aria-hidden="true" size={15} />
-              <span className="nav-create-label">Create event</span>
+              <span>Create a plan</span>
             </button>
           </nav>
         </div>
@@ -76,20 +82,22 @@ function App() {
       <main>
         <section aria-labelledby="hero-title" className="main-shell hero-section">
           <div className="hero-copy">
-            <p className="eyebrow">Your city, in motion</p>
+            <p className="eyebrow">
+              <span aria-hidden="true" className="hero-live-dot" /> Lagos / open plans
+            </p>
             <h1 className="hero-title" id="hero-title">
-              Find a good <span className="title-accent">plan.</span>
+              Find a plan you will be <span className="title-accent">glad you made.</span>
             </h1>
             <p className="hero-lede">
-              A bright, local guide to the gatherings worth leaving the house for.
-              Browse what is next, open the useful bits, and make the next plan yours.
+              Browse easygoing local plans, see the useful details, and find a reason to
+              step out with someone you like.
             </p>
             <div className="hero-actions">
               <a className="primary-button" href="#browse-plans">
-                See what is on <ArrowDown aria-hidden="true" size={16} />
+                Browse plans <ArrowDown aria-hidden="true" size={16} />
               </a>
               <button className="secondary-button" onClick={() => setIsCreateOpen(true)} type="button">
-                Bring a plan <Plus aria-hidden="true" size={16} />
+                Create a plan <Plus aria-hidden="true" size={16} />
               </button>
             </div>
             <div className="hero-proof">
@@ -98,7 +106,7 @@ function App() {
                 <span className="proof-dot" />
                 <span className="proof-dot" />
               </span>
-              <span>Local plans, clear details, no endless scrolling.</span>
+              <span>A little time well spent.</span>
             </div>
           </div>
 
@@ -117,16 +125,17 @@ function App() {
           <div className="main-shell section-shell">
             <div className="section-heading-row">
               <div>
-                <p className="section-kicker">Browse more plans</p>
-                <h2 className="section-title">Make room for something different.</h2>
+                <p className="section-kicker">Browse together</p>
+                <h2 className="section-title">Plans worth leaving the house for.</h2>
               </div>
-              <p className="section-intro">
-                Small gatherings, good streets, and a reason to put the phone down. Open a card for the full picture.
-              </p>
             </div>
             <div className="event-grid">
               {events.map((event) => (
-                <ExpandableEventCard event={event} key={event.id} onOpen={setSelectedEvent} />
+                <ExpandableEventCard
+                  event={event}
+                  key={event.id}
+                  onOpen={setSelectedEvent}
+                />
               ))}
             </div>
           </div>
@@ -136,47 +145,53 @@ function App() {
           <div className="main-shell section-shell">
             <div className="section-heading-row">
               <div>
-                <p className="section-kicker">How it works</p>
-                <h2 className="section-title">Three moves from curious to committed.</h2>
+                <p className="section-kicker">How Ventra works</p>
+                <h2 className="section-title">Three easy moves to a good plan.</h2>
               </div>
-              <p className="section-intro how-intro">
-                The path is short on purpose. Discover the feeling, check the details, then share what you know.
-              </p>
             </div>
             <div className="how-carousel-shell">
               <HowItWorksCarousel steps={howItWorksSteps} />
             </div>
             <div className="how-carousel-note">
               <span>
-                <strong>Swipe or use the arrows</strong> to move through the guide.
+                <strong>A little guidance before you decide.</strong>
               </span>
-              <span>Each step stays visible as you browse.</span>
             </div>
           </div>
         </section>
 
         <section className="create-band" id="create-event">
           <div className="main-shell section-shell create-layout">
-            <div className="create-copy">
-              <p className="section-kicker">Put it on the map</p>
-              <h2 className="section-title">Your next good idea deserves a place to land.</h2>
-              <p>
-                Add the image, name the place, and make it easy for the right people to find you. Your new event appears in this guide immediately.
-              </p>
-            </div>
-            <div aria-label="Create an event" className="create-interface">
-              <div className="create-interface-header">
-                <p className="create-interface-kicker">New event</p>
-                <h3 className="create-interface-title">Make the next plan easy to find.</h3>
-                <p className="create-interface-copy">
-                  Choose a date, add the useful details, and give your event an image people can remember.
-                </p>
+            <div className="create-header">
+              <div>
+                <p className="section-kicker">Share something</p>
+                <h2 className="section-title">Make your next good idea easy to find.</h2>
               </div>
-              <CreateEventForm
-                className="event-form-inline"
-                onCreate={handleCreate}
-                submitLabel="Publish event"
-              />
+            </div>
+            <div className="create-station">
+              <div className="create-aside">
+                <h3>Your plan belongs here too.</h3>
+                <p>
+                  Share it once and it appears in the guide straight away. This demo keeps it here until refresh.
+                </p>
+                <button className="create-aside-action" onClick={() => setIsCreateOpen(true)} type="button">
+                  Open the creator <ArrowUpRight aria-hidden="true" size={15} />
+                </button>
+              </div>
+              <div aria-label="Create an event" className="create-interface">
+                <div className="create-interface-header">
+                  <div>
+                    <p className="create-interface-kicker">New / plan</p>
+                    <h3 className="create-interface-title">Share a plan</h3>
+                  </div>
+                  <span className="create-form-signal"><span /> Almost ready</span>
+                </div>
+                <CreateEventForm
+                  className="event-form-inline"
+                  onCreate={handleCreate}
+                  submitLabel="Publish event"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -184,10 +199,13 @@ function App() {
 
       <footer className="site-footer">
         <div className="main-shell footer-row">
-          <div>
-            <h2 className="footer-title">Events</h2>
-            <p className="footer-note">A local guide for plans worth making.</p>
-          </div>
+          <a aria-label="Ventra home" className="footer-brand" href="#top">
+            <span aria-hidden="true" className="footer-brand-mark">
+              <Route size={16} />
+            </span>
+            <strong>Ventra</strong>
+            <span>Good plans, close to home.</span>
+          </a>
           <div className="footer-links">
             <a className="footer-link" href="#browse-plans">
               Browse
@@ -196,9 +214,10 @@ function App() {
               How it works
             </a>
             <button className="footer-link" onClick={() => setIsCreateOpen(true)} type="button">
-              Create
+              Share a plan <ArrowUpRight aria-hidden="true" size={14} />
             </button>
           </div>
+          <span className="footer-coordinate">06°27&apos;N / 03°24&apos;E</span>
         </div>
       </footer>
 

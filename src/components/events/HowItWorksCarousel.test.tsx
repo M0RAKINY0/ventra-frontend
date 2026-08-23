@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react"
-import { describe, expect, it, vi } from "vitest"
+import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { HowItWorksCarousel } from "@/components/events/HowItWorksCarousel"
 import { howItWorksSteps } from "@/data/events"
 
@@ -10,6 +10,8 @@ vi.stubGlobal(
     disconnect() {}
   },
 )
+
+afterEach(cleanup)
 
 describe("HowItWorksCarousel", () => {
   it("keeps guide cards static when clicked", () => {
@@ -23,5 +25,13 @@ describe("HowItWorksCarousel", () => {
 
     expect(cardTitle.closest("button")).toBeNull()
     expect(screen.queryByRole("dialog")).toBeNull()
+  })
+
+  it("keeps the next guide control available for the horizontal track", () => {
+    render(<HowItWorksCarousel steps={howItWorksSteps} />)
+
+    const nextButton = screen.getByRole("button", { name: "Next guide" })
+
+    expect(nextButton.hasAttribute("disabled")).toBe(false)
   })
 })

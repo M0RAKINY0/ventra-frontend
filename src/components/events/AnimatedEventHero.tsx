@@ -28,7 +28,7 @@ export function AnimatedEventHero({
       events.map((event) => ({
         quote: event.description,
         name: event.title,
-        designation: `${event.category} / ${event.city}`,
+        designation: event.city,
         src: event.imageSrc,
       })),
     [events],
@@ -75,9 +75,6 @@ export function AnimatedEventHero({
       <div className="hero-utility hero-utility-secondary">
         <span className="hero-utility-status">
           {activeEvent.venue}, {activeEvent.city}
-        </span>
-        <span>
-          {String(activeIndex + 1).padStart(2, "0")} / {String(events.length).padStart(2, "0")}
         </span>
       </div>
     </div>

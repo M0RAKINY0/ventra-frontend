@@ -34,6 +34,7 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
   const checkScrollability = useCallback(() => {
     if (carouselRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      if (scrollWidth === 0 && clientWidth === 0) return;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
     }
@@ -141,6 +142,7 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
         </div>
         <div className="mr-10 flex justify-end gap-2">
           <button
+            aria-label="Previous guide"
             className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
             onClick={scrollLeft}
             disabled={!canScrollLeft}
@@ -148,6 +150,7 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
             <ArrowLeft className="h-6 w-6 text-gray-500" />
           </button>
           <button
+            aria-label="Next guide"
             className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
             onClick={scrollRight}
             disabled={!canScrollRight}
@@ -206,7 +209,7 @@ export const Card = ({
   const cardContent = (
     <>
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-full bg-gradient-to-b from-black/50 via-transparent to-transparent" />
-      <div className="relative z-40 p-8">
+      <div className="how-card-overlay relative z-40 p-8">
         <motion.p
           layoutId={layout ? `category-${card.category}` : undefined}
           className="text-left font-sans text-sm font-medium text-white md:text-base"

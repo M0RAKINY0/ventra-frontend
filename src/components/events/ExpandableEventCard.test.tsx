@@ -13,4 +13,16 @@ describe("ExpandableEventCard", () => {
 
     expect(onOpen).toHaveBeenCalledWith(demoEvents[0])
   })
+
+  it("does not render a sequence number over the event image", () => {
+    render(<ExpandableEventCard event={demoEvents[0]} onOpen={vi.fn()} />)
+
+    expect(document.querySelector(".event-card-sequence")).toBeNull()
+  })
+
+  it("does not render a category badge over the event image", () => {
+    render(<ExpandableEventCard event={demoEvents[0]} onOpen={vi.fn()} />)
+
+    expect(document.querySelector(".event-card-badge")).toBeNull()
+  })
 })

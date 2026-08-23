@@ -19,4 +19,16 @@ describe("EventDetailDialog", () => {
 
     expect(onReserve).toHaveBeenCalledWith(demoEvents[0])
   })
+
+  it("does not render the event category as a dialog badge", () => {
+    render(
+      <EventDetailDialog
+        event={demoEvents[0]}
+        onClose={vi.fn()}
+        onReserve={vi.fn()}
+      />,
+    )
+
+    expect(document.querySelector(".event-detail-content .event-badge")).toBeNull()
+  })
 })

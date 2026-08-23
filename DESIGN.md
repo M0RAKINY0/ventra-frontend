@@ -1,40 +1,50 @@
-# Events Design System
+# Ventra Comparison Design System
 
-This is the visual system extracted from the verified Events UI. It is intentionally compact, bright, and editorial rather than promotional.
+This comparison branch applies Ventra's current visual language, logo, and voice to the previous landing-page composition. It stays compact, bright, and editorial rather than importing the route-board layout from the current redesign branch.
 
 ## Product Signal
 
-Events should feel like a living city guide: clear enough to scan quickly, warm enough to make a plan feel inviting, and direct enough that the next action is never ambiguous.
+Ventra should feel like a living city guide: clear enough to scan quickly, warm enough to make a plan feel inviting, and direct enough that the next action is never ambiguous.
+
+## Brand Voice
+
+- The lockup uses the cobalt route mark, `Ventra`, and the utility tag `A city guide`.
+- Hero language is warm and local: `Find a plan you will be glad you made.`
+- Section language uses direct invitations: `Plans worth leaving the house for.`, `Three easy moves to a good plan.`, and `Make your next good idea easy to find.`
+- Actions use the current product vocabulary: `Browse`, `Create a plan`, `Share a plan`, and `Keep browsing`.
+- Navigation and section labels stay unnumbered so the page reads as an invitation rather than a sequence of steps.
 
 ## Color Tokens
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `background` | `#f6f8fb` | Cool-white page canvas |
-| `foreground` | `#122033` | Ink text and dark how-it-works band |
-| `primary` | `#2758f2` | Primary actions, links, focus rings |
-| `accent` | `#ff754f` | Editorial signal, selected state, category emphasis |
-| `secondary` | `#e8f6e8` | Leaf-green supporting status |
-| `muted` | `#edf1f6` | Quiet surfaces and control backgrounds |
-| `muted-foreground` | `#607086` | Supporting copy and metadata |
-| `border` | `#dbe3ee` | Dividers, card edges, input boundaries |
-| `destructive` | `#c93c4a` | Inline validation errors |
+| `background` | `#eef1eb` | Cool paper canvas behind the page |
+| `foreground` | `#17231f` | Ink text and the dark how-it-works band |
+| `primary` | `#2148d8` | Primary actions, links, and focus rings |
+| `accent` | `#f36c42` | Editorial signal, selected state, and category emphasis |
+| `secondary` | `#e4efc9` | Leaf-green supporting surfaces and status |
+| `muted` | `#dfe6dd` | Quiet surfaces and control backgrounds |
+| `muted-foreground` | `#5e6f68` | Supporting copy and metadata |
+| `border` | `#cad6cb` | Dividers, card edges, and input boundaries |
+| `destructive` | `#bf4438` | Inline validation errors |
 
 ## Type
 
-- Display: `Space Grotesk`, with `Trebuchet MS` fallback.
-- Interface: `Plus Jakarta Sans`, with `Segoe UI` fallback.
+- Display: `Archivo Black`, with `Arial Black` fallback.
+- Interface: `DM Sans`, with `Segoe UI` fallback.
+- Utility labels: `Space Mono`, with `Cascadia Mono` fallback.
 - Display headings use a compact negative tracking value and tight line height. Body text uses generous line height for scanning.
 - Type size is responsive through layout constraints, not viewport-scaled text.
 
 ## Geometry
 
-- Primary radius: `8px`.
+- Primary radius: `5.6px` (`0.35rem`).
 - Event cards use `9px` to preserve a slightly softer frame around photography.
 - Buttons and inputs use `6px` to `7px` radii.
+- The How It Works cards keep their rounded frames, while overlay copy uses a `40px` inset so titles do not hug the image corner. The track keeps a trailing scroll affordance so its arrow controls remain usable.
 - Page sections are full-width bands with constrained inner shells. Cards are reserved for repeated event items, dialogs, and the drawer.
 - Media uses stable aspect ratios so loading states and event switching do not resize the layout.
-- The featured-event panel gives the rotated media stack a generous white frame and clips accidental bleed at the rounded boundary.
+- The featured-event panel keeps the previous rotated media stack and gives it a generous warm-white frame.
 - Wheel pickers use a fixed compact height and centered selection band so changing values cannot resize the create form.
 
 ## Components
@@ -49,7 +59,7 @@ Renders date, time, venue, city, and optional price as a consistent icon-led lis
 
 ### `EventBadge`
 
-Renders category labels using default, primary, or accent tones.
+The category badge primitive remains available for future surfaces, but discovery cards and event detail views intentionally omit category labels.
 
 ### `EventActions`
 
@@ -80,6 +90,10 @@ Uses shadcn Sheet primitives and the shared `CreateEventForm`. The form owns dra
 Keeps the inline and drawer versions identical. Category and price share a
 compact basics row, while date and time share a timing row on wider surfaces;
 both groups collapse to one column on mobile and narrow drawer widths.
+
+### `Footer`
+
+The footer uses the current Ventra treatment: an ink background, tangerine route mark, muted utility links, and a small coordinate label. It is a full-width band with one constrained row and remains readable when the row stacks on narrow screens.
 
 ### `WheelColumn`
 

@@ -18,7 +18,7 @@ Event organizers are a secondary audience for the first slice.
 
 ## Product Purpose
 
-Events helps people discover social events, understand the essential details,
+Ventra helps people discover social events, understand the essential details,
 and see how an event listing can be created. Success for this first slice is a
 clear, engaging discovery flow with a working local event-creation demo.
 
@@ -41,13 +41,13 @@ local demo event with a custom image.
 - Seeded event data is local and demo-oriented.
 - A created event lives in in-memory state and is reset on refresh.
 - Event images accept one JPEG, PNG, or WebP file up to 5 MB.
-- The visible product label is `Events`.
+- The visible product label is `Ventra`.
 - No legacy UI or backward compatibility is required because this workspace is
   new.
 
 ## Brand Commitments
 
-- Use the literal product label `Events` during this build.
+- Use the literal product label `Ventra` during this build.
 - Keep copy focused on discovery, event details, and making a new event.
 
 ## Evidence on Hand
