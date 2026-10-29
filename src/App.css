@@ -2913,3 +2913,261 @@
   gap: 10px;
   padding-top: 20px;
 }
+
+.vh-ctas[data-viewport="mobile"],
+.vh-featured {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .vh {
+    height: auto;
+    padding-bottom: 40px;
+  }
+
+  .vh-fan,
+  .vh-brand-tag,
+  .vh-actions,
+  .vh-ctas[data-viewport="desktop"] {
+    display: none;
+  }
+
+  .vh-content {
+    width: 100%;
+    padding: 16px 16px 0;
+  }
+
+  .vh-header {
+    justify-content: space-between;
+  }
+
+  .vh-brand {
+    flex: 0 1 auto;
+    gap: 9px;
+  }
+
+  .vh-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .vh-route-mark {
+    width: 30px;
+    height: 30px;
+  }
+
+  .vh-route-mark svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .vh-brand-name {
+    font-size: 18px;
+  }
+
+  .vh-menu-button {
+    gap: 14px;
+    width: auto;
+    padding: 0 14px;
+    border-radius: 10px;
+  }
+
+  .vh-menu-lines span {
+    width: 22px;
+  }
+
+  .vh-menu-panel {
+    left: auto;
+    width: 200px;
+  }
+
+  .vh-copy {
+    padding-top: 34px;
+  }
+
+  .vh-wordmark {
+    font-size: min(86px, 22vw);
+    line-height: 0.78;
+  }
+
+  .vh-lede {
+    max-width: 258px;
+    padding-top: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .vh-ctas[data-viewport="mobile"] {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .vh-ctas[data-viewport="mobile"] .vh-button {
+    flex: 1 0 0;
+    gap: 8px;
+    min-width: 0;
+    height: 48px;
+    padding: 0 12px;
+  }
+
+  .vh-featured {
+    display: block;
+    width: 100%;
+    padding-top: 28px;
+  }
+}
+
+.vh-plan-card {
+  overflow: hidden;
+  border: 1px solid var(--vh-card-line);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px -24px rgba(17, 17, 16, 0.45);
+}
+
+.vh-photo-wrap {
+  padding: 18px 20px 10px;
+}
+
+.vh-photo-stack {
+  position: relative;
+  aspect-ratio: 316 / 204;
+}
+
+.vh-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
+.vh-photo[data-stacked="true"] {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  opacity: 0.7;
+}
+
+.vh-photo-active {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 9px;
+}
+
+.vh-photo-active .vh-photo {
+  animation: vh-photo-in 260ms ease-out;
+}
+
+@keyframes vh-photo-in {
+  from {
+    opacity: 0.4;
+    transform: scale(1.03);
+  }
+}
+
+.vh-category-chip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--vh-ink);
+  background: var(--vh-paper);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vh-plan-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 12px;
+}
+
+.vh-plan-title {
+  margin: 0;
+  font-family: var(--vh-font-display);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.vh-plan-description {
+  margin: 0;
+  color: var(--vh-ink-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.vh-plan-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.vh-plan-when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.vh-plan-when strong {
+  font-weight: 500;
+}
+
+.vh-plan-when span {
+  color: var(--vh-ink-soft);
+}
+
+.vh-details {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--vh-paper);
+  background: var(--vh-ink);
+  font-size: 13px;
+}
+
+.vh-dots {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding-top: 4px;
+}
+
+.vh-dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.vh-dot span {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--vh-dot);
+  transition: width 200ms ease, background-color 200ms ease;
+}
+
+.vh-dot[aria-current="true"] span {
+  width: 18px;
+  background: var(--vh-ink);
+}

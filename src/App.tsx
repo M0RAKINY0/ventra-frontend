@@ -14,6 +14,7 @@ import type { Event, EventDraft } from "@/types/events"
 
 function App() {
   const [events, setEvents] = useState<Event[]>(demoEvents)
+  const [activeEventId, setActiveEventId] = useState(demoEvents[0].id)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [pathname, setPathname] = useState(() => window.location.pathname)
@@ -34,6 +35,7 @@ function App() {
   const handleCreate = (draft: EventDraft) => {
     const event = buildEventFromDraft(draft, `event-${crypto.randomUUID()}`)
     setEvents((previousEvents) => [...previousEvents, event])
+    setActiveEventId(event.id)
   }
 
   const handleReserve = () => navigateTo("/login")
@@ -45,7 +47,13 @@ function App() {
   return (
     <div className="events-app" id="top">
       <main>
-        <VentraHero events={events} onCreate={() => setIsCreateOpen(true)} />
+        <VentraHero
+          activeEventId={activeEventId}
+          events={events}
+          onActiveChange={setActiveEventId}
+          onCreate={() => setIsCreateOpen(true)}
+          onOpen={setSelectedEvent}
+        />
 
         <section className="section-band" id="browse-plans">
           <div className="main-shell section-shell">
