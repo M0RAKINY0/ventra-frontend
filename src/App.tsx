@@ -1,13 +1,13 @@
-import { ArrowDown, ArrowUpRight, Plus, Route } from "lucide-react"
+import { ArrowUpRight, Route } from "lucide-react"
 import { useEffect, useState } from "react"
 import "./App.css"
-import { AnimatedEventHero } from "@/components/events/AnimatedEventHero"
 import { CreateEventDrawer } from "@/components/events/CreateEventDrawer"
 import { CreateEventForm } from "@/components/events/CreateEventForm"
 import { EventDetailDialog } from "@/components/events/EventDetailDialog"
 import { ExpandableEventCard } from "@/components/events/ExpandableEventCard"
 import { HowItWorksCarousel } from "@/components/events/HowItWorksCarousel"
 import { LoginPage } from "@/components/events/LoginPage"
+import { VentraHero } from "@/components/hero/VentraHero"
 import { howItWorksSteps, demoEvents } from "@/data/events"
 import { buildEventFromDraft } from "@/lib/event-draft"
 import type { Event, EventDraft } from "@/types/events"
@@ -46,80 +46,14 @@ function App() {
 
   return (
     <div className="events-app" id="top">
-      <header className="site-header route-site-header">
-        <div className="nav-wrap route-header-inner">
-          <a className="route-brand-lockup" href="#top" aria-label="Ventra home">
-            <span aria-hidden="true" className="route-brand-mark">
-              <Route size={18} />
-            </span>
-            <span className="route-brand-name">Ventra</span>
-            <span className="route-brand-tag">A city guide</span>
-          </a>
-          <nav aria-label="Primary navigation" className="route-nav">
-            <a className="route-nav-link" href="#browse-plans">
-              Browse
-            </a>
-            <a className="route-nav-link" href="#how-it-works">
-              How it works
-            </a>
-            <a className="route-nav-link" href="#create-event">
-              Create
-            </a>
-            <button
-              aria-label="Create an event"
-              className="route-nav-create"
-              onClick={() => setIsCreateOpen(true)}
-              title="Create an event"
-              type="button"
-            >
-              <Plus aria-hidden="true" size={15} />
-              <span>Create a plan</span>
-            </button>
-          </nav>
-        </div>
-      </header>
-
       <main>
-        <section aria-labelledby="hero-title" className="main-shell hero-section">
-          <div className="hero-copy">
-            <p className="eyebrow">
-              <span aria-hidden="true" className="hero-live-dot" /> Lagos / open plans
-            </p>
-            <h1 className="hero-title" id="hero-title">
-              Find a plan you will be <span className="title-accent">glad you made.</span>
-            </h1>
-            <p className="hero-lede">
-              Browse easygoing local plans, see the useful details, and find a reason to
-              step out with someone you like.
-            </p>
-            <div className="hero-actions">
-              <a className="primary-button" href="#browse-plans">
-                Browse plans <ArrowDown aria-hidden="true" size={16} />
-              </a>
-              <button className="secondary-button" onClick={() => setIsCreateOpen(true)} type="button">
-                Create a plan <Plus aria-hidden="true" size={16} />
-              </button>
-            </div>
-            <div className="hero-proof">
-              <span aria-hidden="true" className="proof-dots">
-                <span className="proof-dot" />
-                <span className="proof-dot" />
-                <span className="proof-dot" />
-              </span>
-              <span>A little time well spent.</span>
-            </div>
-          </div>
-
-          <div className="hero-stage">
-            <AnimatedEventHero
-              activeEventId={activeEventId}
-              autoplay
-              events={events}
-              onActiveChange={setActiveEventId}
-              onOpen={setSelectedEvent}
-            />
-          </div>
-        </section>
+        <VentraHero
+          activeEventId={activeEventId}
+          events={events}
+          onActiveChange={setActiveEventId}
+          onCreate={() => setIsCreateOpen(true)}
+          onOpen={setSelectedEvent}
+        />
 
         <section className="section-band" id="browse-plans">
           <div className="main-shell section-shell">
