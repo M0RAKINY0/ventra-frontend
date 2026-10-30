@@ -85,7 +85,7 @@ export function GlobeSection({ events }: GlobeSectionProps) {
     }
 
     let cancelled = false
-    fetch("/data/land-dots.json")
+    fetch(`${import.meta.env.BASE_URL}data/land-dots.json`)
       .then((response) => response.json() as Promise<number[]>)
       .then((pairs) => {
         if (cancelled) return

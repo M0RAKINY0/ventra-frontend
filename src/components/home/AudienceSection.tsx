@@ -58,7 +58,7 @@ export function AudienceSection() {
   const [isPaused, setIsPaused] = useState(false)
 
   return (
-    <section aria-labelledby="aud-title" className="aud" data-paused={isPaused || undefined}>
+    <section aria-labelledby="aud-title" className="aud" data-paused={isPaused || undefined} id="browse-plans">
       <h2 className="aud-heading" id="aud-title">
         <span>Built for people</span> who go out.
       </h2>
