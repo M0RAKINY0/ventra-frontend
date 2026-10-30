@@ -43,6 +43,34 @@ describe("SharePlanSection", () => {
     expect(onCreate).not.toHaveBeenCalled()
   })
 
+  it("rejects a spot limit that is not a whole number", () => {
+    const onCreate = vi.fn()
+    render(<SharePlanSection onCreate={onCreate} />)
+
+    fillRequiredText()
+    fill("Spots", "0")
+    fireEvent.click(screen.getByRole("button", { name: /publish plan/i }))
+
+    expect(screen.getByRole("alert").textContent).toBe(
+      "Spots must be a whole number, 1 or more. Leave it empty for no limit.",
+    )
+    expect(onCreate).not.toHaveBeenCalled()
+  })
+
+  it("passes the spot limit through as capacity", () => {
+    const onCreate = vi.fn()
+    render(<SharePlanSection onCreate={onCreate} />)
+
+    fillRequiredText()
+    fill("Spots", "40")
+    fireEvent.change(screen.getByLabelText(/add a photo/i), {
+      target: { files: [new File(["x"], "walk.png", { type: "image/png" })] },
+    })
+    fireEvent.click(screen.getByRole("button", { name: /publish plan/i }))
+
+    expect(onCreate).toHaveBeenCalledWith(expect.objectContaining({ capacity: 40 }))
+  })
+
   it("publishes a draft with formatted date and time", () => {
     const onCreate = vi.fn()
     render(<SharePlanSection onCreate={onCreate} />)
@@ -62,6 +90,7 @@ describe("SharePlanSection", () => {
         imagePreviewUrl: "blob:preview",
       }),
     )
+    expect("capacity" in onCreate.mock.calls[0][0]).toBe(false)
     expect(screen.getByRole("status").textContent).toBe("Your plan is live in the guide.")
     expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe("")
   })

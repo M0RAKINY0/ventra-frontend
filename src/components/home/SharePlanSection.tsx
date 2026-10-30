@@ -14,6 +14,7 @@ type Fields = {
   time: string
   venue: string
   city: string
+  spots: string
   description: string
 }
 
@@ -25,6 +26,7 @@ const emptyFields: Fields = {
   time: "",
   venue: "",
   city: "",
+  spots: "",
   description: "",
 }
 
@@ -94,6 +96,11 @@ export function SharePlanSection({ onCreate }: SharePlanSectionProps) {
       setError(missing[1])
       return
     }
+    const spots = fields.spots.trim()
+    if (spots && !/^[1-9]\d*$/.test(spots)) {
+      setError("Spots must be a whole number, 1 or more. Leave it empty for no limit.")
+      return
+    }
     if (!image) {
       setError("Add a photo before publishing.")
       return
@@ -108,6 +115,7 @@ export function SharePlanSection({ onCreate }: SharePlanSectionProps) {
       city: fields.city.trim() || "Lagos",
       description: fields.description.trim(),
       priceLabel: fields.priceLabel.trim() || "Free entry",
+      ...(spots ? { capacity: Number(spots) } : {}),
       imageFile: image.file,
       imagePreviewUrl: image.url,
     })
@@ -157,13 +165,25 @@ export function SharePlanSection({ onCreate }: SharePlanSectionProps) {
             Time
             <input onChange={update("time")} type="time" value={fields.time} />
           </label>
-          <label className="share-field">
+          <label className="share-field share-full">
             Venue
             <input onChange={update("venue")} placeholder="The name of the place" type="text" value={fields.venue} />
           </label>
           <label className="share-field">
             City
             <input onChange={update("city")} placeholder="Lagos" type="text" value={fields.city} />
+          </label>
+          <label className="share-field">
+            Spots
+            <input
+              inputMode="numeric"
+              min={1}
+              onChange={update("spots")}
+              placeholder="No limit"
+              step={1}
+              type="number"
+              value={fields.spots}
+            />
           </label>
           <label className="share-field share-full">
             Description
