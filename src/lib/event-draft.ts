@@ -15,6 +15,7 @@ export function buildEventFromDraft(draft: EventDraft, id: string): Event {
     city: draft.city,
     description: draft.description,
     priceLabel: draft.priceLabel,
+    ...(draft.capacity ? { capacity: draft.capacity } : {}),
     imageSrc: draft.imagePreviewUrl,
   }
 }

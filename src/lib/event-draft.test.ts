@@ -31,6 +31,11 @@ describe("buildEventFromDraft", () => {
     })
   })
 
+  it("carries a spot limit through when the host sets one", () => {
+    expect(buildEventFromDraft({ ...draft, capacity: 40 }, "event-capped").capacity).toBe(40)
+    expect("capacity" in buildEventFromDraft(draft, "event-open")).toBe(false)
+  })
+
   it("requires an image preview before creating an event", () => {
     expect(() =>
       buildEventFromDraft({ ...draft, imagePreviewUrl: null }, "event-missing-image"),

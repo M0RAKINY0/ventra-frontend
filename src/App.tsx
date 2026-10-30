@@ -5,6 +5,7 @@ import { EventDetailDialog } from "@/components/events/EventDetailDialog"
 import { LoginPage } from "@/components/events/LoginPage"
 import { VentraHero } from "@/components/hero/VentraHero"
 import { AudienceSection } from "@/components/home/AudienceSection"
+import { FaqSection } from "@/components/home/FaqSection"
 import { GlobeSection } from "@/components/home/GlobeSection"
 import { HowToUseSection } from "@/components/home/HowToUseSection"
 import { SharePlanSection } from "@/components/home/SharePlanSection"
@@ -59,6 +60,7 @@ function App() {
         <AudienceSection />
         <GlobeSection events={events} />
         <HowToUseSection />
+        <FaqSection />
         <SharePlanSection onCreate={handleCreate} />
       </main>
 
