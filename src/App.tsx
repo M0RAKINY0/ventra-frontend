@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import "./App.css"
 import { CreateEventDrawer } from "@/components/events/CreateEventDrawer"
 import { EventDetailDialog } from "@/components/events/EventDetailDialog"
-import { ExpandableEventCard } from "@/components/events/ExpandableEventCard"
 import { LoginPage } from "@/components/events/LoginPage"
 import { VentraHero } from "@/components/hero/VentraHero"
 import { AudienceSection } from "@/components/home/AudienceSection"
@@ -59,27 +58,6 @@ function App() {
 
         <AudienceSection />
         <GlobeSection events={events} />
-
-        <section className="section-band" id="browse-plans">
-          <div className="main-shell section-shell">
-            <div className="section-heading-row">
-              <div>
-                <p className="section-kicker">Browse together</p>
-                <h2 className="section-title">Plans worth leaving the house for.</h2>
-              </div>
-            </div>
-            <div className="event-grid">
-              {events.map((event) => (
-                <ExpandableEventCard
-                  event={event}
-                  key={event.id}
-                  onOpen={setSelectedEvent}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
         <HowToUseSection />
         <SharePlanSection onCreate={handleCreate} />
       </main>
