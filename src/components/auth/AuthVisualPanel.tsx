@@ -40,7 +40,7 @@ function CityVisual({ event }: AuthVisualPanelProps) {
         <EventMedia alt="People gathering in Lagos after sunset" src={event.imageSrc} />
       </div>
       <div className="auth-city-image auth-city-image-front">
-        <EventMedia alt="A lively local plan in Lagos" src="/events/street-sessions.png" />
+        <EventMedia alt="A lively local plan in Lagos" src="/events/street-sessions.webp" />
       </div>
       <div className="auth-city-copy">
         <p className="auth-visual-kicker">A city worth wandering</p>
@@ -54,7 +54,7 @@ function CityVisual({ event }: AuthVisualPanelProps) {
 function SignalVisual() {
   return (
     <div className="auth-visual-stage auth-visual-stage-signal">
-      <EventMedia alt="People making ceramics together in a bright studio" src="/events/ceramics-club.png" />
+      <EventMedia alt="People making ceramics together in a bright studio" src="/events/ceramics-club.webp" />
       <div aria-hidden="true" className="auth-signal-overlay" />
       <div aria-hidden="true" className="auth-signal-lines" />
       <div className="auth-signal-copy">

@@ -1,4 +1,5 @@
 import { Compass, Megaphone, Users, type LucideIcon } from "lucide-react"
+import { eventSrcSet } from "@/lib/event-image"
 import { useState } from "react"
 
 type Audience = {
@@ -14,14 +15,14 @@ const audiences: Audience[] = [
   {
     title: "Plan-goers",
     description: "See what's on tonight and pick something you'll actually enjoy.",
-    imageSrc: "/events/street-sessions.png",
+    imageSrc: "/events/street-sessions.webp",
     imageAlt: "A crowd dancing at a street party in the afternoon",
     icon: Compass,
   },
   {
     title: "Friends & night-outs",
     description: "Pick a plan together and get everyone out the door.",
-    imageSrc: "/events/night-market.png",
+    imageSrc: "/events/night-market.webp",
     imageAlt: "Friends gathering under string lights at a night market",
     icon: Users,
     featured: true,
@@ -29,7 +30,7 @@ const audiences: Audience[] = [
   {
     title: "Hosts & creators",
     description: "Post your plan once and it shows up in the guide straight away.",
-    imageSrc: "/events/ceramics-club.png",
+    imageSrc: "/events/ceramics-club.webp",
     imageAlt: "People shaping clay at a ceramics workshop",
     icon: Megaphone,
   },
@@ -40,7 +41,14 @@ function AudienceCard({ audience, hidden = false }: { audience: Audience; hidden
 
   return (
     <article aria-hidden={hidden || undefined} className="aud-card" data-featured={audience.featured || undefined}>
-      <img alt={hidden ? "" : audience.imageAlt} src={audience.imageSrc} />
+      <img
+        alt={hidden ? "" : audience.imageAlt}
+        decoding="async"
+        loading="lazy"
+        sizes="(max-width: 768px) 90vw, 33vw"
+        src={audience.imageSrc}
+        srcSet={eventSrcSet(audience.imageSrc)}
+      />
       <div className="aud-strip">
         <span aria-hidden="true" className="aud-icon">
           <Icon size={18} />

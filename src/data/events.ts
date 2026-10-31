@@ -12,7 +12,7 @@ export const demoEvents: Event[] = [
     description:
       "A late-night loop of small plates, independent makers, and warm live sets by the water.",
     priceLabel: "Free entry",
-    imageSrc: "/events/night-market.png",
+    imageSrc: "/events/night-market.webp",
   },
   {
     id: "rooftop-cinema-sunlit",
@@ -25,7 +25,7 @@ export const demoEvents: Event[] = [
     description:
       "An open-air film night with city views, shared snacks, and a hand-picked summer double bill.",
     priceLabel: "From NGN 8,000",
-    imageSrc: "/events/rooftop-cinema.png",
+    imageSrc: "/events/rooftop-cinema.webp",
   },
   {
     id: "clay-after-hours",
@@ -38,7 +38,7 @@ export const demoEvents: Event[] = [
     description:
       "Shape a small set of hand-built ceramics with a patient guide and a room full of curious people.",
     priceLabel: "From NGN 18,500",
-    imageSrc: "/events/ceramics-club.png",
+    imageSrc: "/events/ceramics-club.webp",
   },
   {
     id: "street-sessions",
@@ -51,7 +51,7 @@ export const demoEvents: Event[] = [
     description:
       "A neighbourhood block party with rotating DJs, smoky grills, and the kind of dancing that starts early.",
     priceLabel: "Free entry",
-    imageSrc: "/events/street-sessions.png",
+    imageSrc: "/events/street-sessions.webp",
   },
   {
     id: "draw-the-city",
@@ -64,7 +64,7 @@ export const demoEvents: Event[] = [
     description:
       "A slow sketch walk through changing streets, with prompts for first-timers and a coffee stop at the end.",
     priceLabel: "NGN 3,500",
-    imageSrc: "/events/sketch-walk.png",
+    imageSrc: "/events/sketch-walk.webp",
   },
 ]
 export const howItWorksSteps: HowItWorksStep[] = [
@@ -74,7 +74,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
     title: "Find a plan that fits your day",
     description:
       "Scan the hero for what is happening now, then browse a fuller list when you want more choice.",
-    imageSrc: "/events/night-market.png",
+    imageSrc: "/events/night-market.webp",
     imageAlt: "Friends gathering under lights at a night market",
   },
   {
@@ -83,7 +83,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
     title: "Open the details before you commit",
     description:
       "Every event keeps the practical bits together: time, place, price, and the feeling of the room.",
-    imageSrc: "/events/rooftop-cinema.png",
+    imageSrc: "/events/rooftop-cinema.webp",
     imageAlt: "A rooftop cinema setup overlooking the city",
   },
   {
@@ -92,7 +92,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
     title: "Put your own plan on the map",
     description:
       "Share the next gathering with a clear image and the details people need to show up.",
-    imageSrc: "/events/ceramics-club.png",
+    imageSrc: "/events/ceramics-club.webp",
     imageAlt: "People making ceramics together in a bright studio",
   },
 ]
