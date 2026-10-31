@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { eventSrcSet } from "@/lib/event-image"
 import { createGlobe, decodeLandDots, type GlobeFrame, type GlobeRoute } from "@/lib/globe"
 import type { Event } from "@/types/events"
 
@@ -145,7 +146,7 @@ export function GlobeSection({ events }: GlobeSectionProps) {
             return (
               <div className="globe-flyer" key={`flyer-${route.eventId}`} ref={(element) => { flyerRefs.current[index] = element }}>
                 <div className="globe-flyer-card">
-                  <img alt="" src={event.imageSrc} />
+                  <img alt="" decoding="async" loading="lazy" sizes="200px" src={event.imageSrc} srcSet={eventSrcSet(event.imageSrc)} />
                   <p className="globe-flyer-title">{event.title}</p>
                   <p className="globe-flyer-meta">
                     {route.to.name} · {route.day}

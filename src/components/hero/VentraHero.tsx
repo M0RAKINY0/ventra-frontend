@@ -1,4 +1,5 @@
 import { ArrowRight, ArrowUpRight, Plus, Route } from "lucide-react"
+import { eventSrcSet } from "@/lib/event-image"
 import { useCallback, useRef, useState } from "react"
 import { useOutsideClick } from "@/hooks/use-outside-click"
 import type { Event } from "@/types/events"
@@ -59,8 +60,11 @@ export function VentraHero({ events, activeEventId, onActiveChange, onCreate, on
             <img
               alt=""
               className="vh-print"
+              decoding="async"
               key={event.id}
+              sizes={`${Math.round(slot.w)}px`}
               src={event.imageSrc}
+              srcSet={eventSrcSet(event.imageSrc)}
               style={{
                 left: `calc(50% + ${slot.x}px)`,
                 top: `${slot.y}px`,
@@ -184,8 +188,11 @@ function FeaturedPlans({ events, activeEventId, onActiveChange, onOpen }: Featur
                   alt=""
                   className="vh-photo"
                   data-stacked="true"
+                  decoding="async"
                   key={event.id}
+                  sizes="320px"
                   src={event.imageSrc}
+                  srcSet={eventSrcSet(event.imageSrc)}
                   style={{
                     left: `${slot.x}%`,
                     top: `${slot.y}%`,
@@ -195,7 +202,15 @@ function FeaturedPlans({ events, activeEventId, onActiveChange, onOpen }: Featur
               )
             })}
             <div className="vh-photo-active">
-              <img alt={activeEvent.title} className="vh-photo" key={activeEvent.id} src={activeEvent.imageSrc} />
+              <img
+                alt={activeEvent.title}
+                className="vh-photo"
+                fetchPriority="high"
+                key={activeEvent.id}
+                sizes="320px"
+                src={activeEvent.imageSrc}
+                srcSet={eventSrcSet(activeEvent.imageSrc)}
+              />
               <span className="vh-category-chip">{activeEvent.category}</span>
             </div>
           </div>
