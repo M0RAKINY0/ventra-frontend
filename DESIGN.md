@@ -1,135 +1,51 @@
-# Ventra Comparison Design System
+# Ventra design: photo-first
 
-This comparison branch applies Ventra's current visual language, logo, and voice to the previous landing-page composition. It stays compact, bright, and editorial rather than importing the route-board layout from the current redesign branch.
+Event photography carries the interface. Most screens open on a full-bleed photo with the title set over it, and a light panel slides up over the bottom of the photo to hold the controls. The prototype for every screen, on desktop and phone, is the "Photo-first" rows of the Ventra design canvas.
 
-## Product Signal
+This covers the app pages under `src/pages/`. The landing page at `/` keeps its own Figma styles (`--rd-*` tokens and `src/App.css`).
 
-Ventra should feel like a living city guide: clear enough to scan quickly, warm enough to make a plan feel inviting, and direct enough that the next action is never ambiguous.
+## Layout
 
-## Brand Voice
+- **Photo header.** Full-bleed image, dark scrim top and bottom (`.scrim-hero`), white text anchored to the bottom. The site header sits on top of it.
+- **Sheet.** The content panel after a photo header overlaps it by 32px on phones and 48px on desktop, with 28px and 40px top corners (`Sheet` in `components/ui.tsx`).
+- **Width.** Content sits in a 1320px container with 16px, 24px or 40px side padding by breakpoint.
+- **Detail screens** (event, ticket, manage) put the main information on the left and an action card on the right. Below 900px or so they stack.
 
-- The lockup uses the cobalt route mark, `Ventra`, and the utility tag `A city guide`.
-- Hero language is warm and local: `Find a plan you will be glad you made.`
-- Section language uses direct invitations: `Plans worth leaving the house for.`, `Three easy moves to a good plan.`, and `Make your next good idea easy to find.`
-- Actions use the current product vocabulary: `Browse`, `Create a plan`, `Share a plan`, and `Keep browsing`.
-- Navigation and section labels stay unnumbered so the page reads as an invitation rather than a sequence of steps.
+## Navigation
 
-## Color Tokens
+- From `md` up, a frosted glass pill (`.glass`) in the header holds Browse, My tickets, Hosting, Check-in, and Admin (admins only). The current page shows as a white pill.
+- On phones the header keeps only the logo and account button. A frosted tab bar floats at the bottom (`MobileTabBar`). Detail screens hide it and show their own bottom action bar instead.
+
+## Colour
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `background` | `#eef1eb` | Cool paper canvas behind the page |
-| `foreground` | `#17231f` | Ink text and the dark how-it-works band |
-| `primary` | `#2148d8` | Primary actions, links, and focus rings |
-| `accent` | `#f36c42` | Editorial signal, selected state, and category emphasis |
-| `secondary` | `#e4efc9` | Leaf-green supporting surfaces and status |
-| `muted` | `#dfe6dd` | Quiet surfaces and control backgrounds |
-| `muted-foreground` | `#5e6f68` | Supporting copy and metadata |
-| `border` | `#cad6cb` | Dividers, card edges, and input boundaries |
-| `destructive` | `#bf4438` | Inline validation errors |
+| `ink` | `#17231f` | Text, primary buttons, dark backgrounds |
+| `paper` | `#f4f6f2` | Page and sheet background |
+| `cream` | `#fffdf7` | Text on dark buttons, frosted cards |
+| `cobalt` | `#2148d8` | Links and focus rings |
+| `tangerine` | `#f36c42` | "Few left" badges |
+| `lime` | `#e4efc9` | Ready, live and success states |
+| `danger` | `#bf4438` | Destructive actions and errors |
+
+Status pills: ready and live use lime, issuing uses `#fbe6c8`, cancelled uses `#f8dcd6`, draft and used use white.
 
 ## Type
 
-- Display: `Archivo Black`, with `Arial Black` fallback.
-- Interface: `DM Sans`, with `Segoe UI` fallback.
-- Utility labels: `Space Mono`, with `Cascadia Mono` fallback.
-- Display headings use a compact negative tracking value and tight line height. Body text uses generous line height for scanning.
-- Type size is responsive through layout constraints, not viewport-scaled text.
-
-## Geometry
-
-- Primary radius: `5.6px` (`0.35rem`).
-- Event cards use `9px` to preserve a slightly softer frame around photography.
-- Buttons and inputs use `6px` to `7px` radii.
-- The How It Works cards keep their rounded frames, while overlay copy uses a `40px` inset so titles do not hug the image corner. The track keeps a trailing scroll affordance so its arrow controls remain usable.
-- Page sections are full-width bands with constrained inner shells. Cards are reserved for repeated event items, dialogs, and the drawer.
-- Media uses stable aspect ratios so loading states and event switching do not resize the layout.
-- The featured-event panel keeps the previous rotated media stack and gives it a generous warm-white frame.
-- Wheel pickers use a fixed compact height and centered selection band so changing values cannot resize the create form.
+- Display: Archivo Black, for page titles and titles over photos. Sizes use `clamp()` so a 84px desktop title drops to about 36px on a phone.
+- Interface: DM Sans.
+- Ticket codes: Space Mono.
 
 ## Components
 
-### `EventMedia`
-
-Owns stable image sizing, alt text, and local or object URL sources.
-
-### `EventMeta`
-
-Renders date, time, venue, city, and optional price as a consistent icon-led list.
-
-### `EventBadge`
-
-The category badge primitive remains available for future surfaces, but discovery cards and event detail views intentionally omit category labels.
-
-### `EventActions`
-
-Keeps the primary card action consistent and uses an icon plus a short command label.
-
-### `AnimatedEventHero`
-
-An adapter over Aceternity `AnimatedTestimonials`. It maps `Event` data to the existing content contract and adds controlled active state, autoplay, pause-on-hover/focus, arrow-key navigation, indicators, metadata, and reduced-motion support.
-
-### `ExpandableEventCard`
-
-An event version of the Aceternity standard expandable card pattern. The full card surface is a keyboard-accessible detail trigger, while the actual content lives in one shared dialog with outside-click, Escape, focusable close controls, a soft blurred backdrop, and mobile-safe sizing.
-
-### `HowItWorksCarousel`
-
-Uses the Aceternity Apple cards carousel track with three static local step cards. The track is horizontally scrollable and its controls remeasure after responsive layout and image loading; cards never open a second view.
-
-### `LoginPage`
-
-Provides the `/login` destination for reservation intent until authentication is connected. The page uses a spacious split layout: a focused sign-in/sign-up task on the left and an event-led visual field on the right. `AuthForm` owns the mode switch, social/email presentation, native validation with inline invalid-field messages, live demo feedback, an explicit no-session disclosure, and the return action. `AuthVisualPanel` defaults to event photography and exposes `event`, `city`, and `signal` treatments through accessible pressed-state controls. The visual field hides below the tablet breakpoint so the auth task stays short, primary, and free from a clipped split grid.
-
-### `AuthForm` and `AuthVisualPanel`
-
-The auth primitives use the existing Ventra palette and typography rather than introducing a separate authentication theme. Sign-in copy is `Keep your next plan close.` and sign-up copy is `Make room for a good plan.`. Google and email actions are intentionally demo-only; the form states this directly, validates invalid fields inline, and valid submissions show local status feedback without creating sessions, calling providers, or persisting credentials. Auth heading sizes use fixed type steps at responsive breakpoints so the composition stays stable instead of scaling with viewport width.
-
-### `CreateEventDrawer`
-
-Uses shadcn Sheet primitives and the shared `CreateEventForm`. The form owns draft state, field validation, preview URL lifecycle, replacement, removal, and publish handoff in both the inline create surface and the drawer.
-
-### `CreateEventForm`
-
-Keeps the inline and drawer versions identical. Category and price share a
-compact basics row, while date and time share a timing row on wider surfaces;
-both groups collapse to one column on mobile and narrow drawer widths.
-
-### `Footer`
-
-The footer uses the current Ventra treatment: an ink background, tangerine route mark, muted utility links, and a small coordinate label. It is a full-width band with one constrained row and remains readable when the row stacks on narrow screens.
-
-### `WheelColumn`
-
-Provides the compact iOS-inspired vertical picker primitive. Its selected row sits inside a quiet center band, adjacent values fade into the background, and the column supports snap scrolling plus Arrow, Home, and End keyboard movement.
-
-### `ScrollableDatePicker` and `ScrollableTimePicker`
-
-Compose three linked wheel columns for dates (`weekday`, `day`, `month`) and times (`hour`, `minute`, `AM/PM`). The month column is deduplicated to one option per available month and maps back to the nearest valid date while preserving the selected day when possible. They format directly into the existing event draft strings without adding manual text inputs or changing the publish contract.
-
-## Motion
-
-- Hero transitions use short opacity, scale, and position changes.
-- Event cards lift by `4px` on hover.
-- Drawer and detail dialogs use short, reversible entrances.
-- Autoplay pauses on hover and focus.
-- `prefers-reduced-motion: reduce` removes autoplay and compresses animated transitions.
-- Wheel movement uses native scroll snapping and compact transitions so it remains usable with reduced motion enabled.
+- `.pill` buttons are fully rounded, at least 52px tall, in `pill-dark`, `pill-light`, `pill-soft`, `pill-danger` and `pill-danger-soft`.
+- `.chip` filters use `aria-pressed`. `.segmented` tab groups use `aria-selected`.
+- `.field` inputs are 52px tall with 16px corners. Errors set `aria-invalid` and show a message linked with `aria-describedby`.
+- Photo tiles are 3:4 on desktop and 4:3 on phones, with the date in a glass chip and the title over a bottom scrim.
 
 ## Accessibility
 
-- Semantic headings and section landmarks are used throughout the route.
-- Controls have visible focus rings, accessible labels, and familiar icons.
-- Hero arrows and indicators support keyboard navigation.
-- Detail dialogs support Escape, outside click, and a focusable close button.
-- Browse event cards open from their full surface and expose a keyboard activation path.
-- Reserve event routes to the login destination without pretending to complete authentication.
-- Login supports sign-in/sign-up switching, native required/email validation with inline messages, a visible focus path, and an `aria-live` demo status without implying a connected provider.
-- The auth visual selector uses `aria-pressed` controls and remains available for design exploration on desktop; the visual panel is hidden on mobile.
-- The create form keeps validation inline and the upload surface supports keyboard activation through the dropzone control.
-- Date and time wheels expose listbox options with selected state and keyboard movement; no manual date or time text fields are required.
-- Mobile layouts keep the page and dialog within the viewport width; horizontal overflow is limited to the intentionally scrollable Apple card track.
-
-## Imagery
-
-The five local PNGs in `public/events` are deterministic demo assets generated for this slice. They are intentionally free of embedded text and logos so they can be replaced with real event photography without changing component contracts.
+- Every interactive element is a real button, link or input, at least 44px tall.
+- White text only sits on photos behind a scrim.
+- Focus rings are cobalt on light backgrounds and leaf green (`.on-photo`) on photos.
+- `prefers-reduced-motion` removes the image zoom and spinner motion.

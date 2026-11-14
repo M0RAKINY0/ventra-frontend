@@ -4,68 +4,59 @@
 
 ## Platform
 
-web
+web (responsive, phone and desktop)
 
 ## Stack
 
-delegated: Vite + React + TypeScript with Tailwind CSS, shadcn/ui, and
-Aceternity UI components.
+delegated: Vite + React + TypeScript with Tailwind CSS v4 and lucide-react icons.
+Data comes from the Ventra API (`ticketflow-source`, Express + Prisma + Better Auth).
 
 ## Users
 
-People discovering urban social events and looking for a compelling next plan.
-Event organizers are a secondary audience for the first slice.
+People looking for a social event to go to in their city, and the organizers who
+run those events and check people in at the door. Admins manage roles and can
+cancel any event.
 
 ## Product Purpose
 
-Ventra helps people discover social events, understand the essential details,
-and see how an event listing can be created. Success for this first slice is a
-clear, engaging discovery flow with a working local event-creation demo.
+Find an event, reserve a spot, and get in with a QR code. Organizers create
+drafts, add ticket types, publish, and scan tickets on the night.
 
 ## Positioning
 
-The first slice makes event discovery feel like browsing a living city guide:
-the event itself is the primary content, with motion used to switch between
-realistic event examples and details available without leaving the surface.
-
-## Operating Context
-
-Visitors browse on desktop or mobile, scan event imagery and metadata, expand
-events for more information, learn the basic flow, and optionally create a
-local demo event with a custom image.
+Photo-first: the event's own photography is the main content on every screen.
+The interface stays out of the way on frosted panels.
 
 ## Capabilities and Constraints
 
-- The app is client-only for this slice; there is no backend or persistent
-  storage.
-- Seeded event data is local and demo-oriented.
-- A created event lives in in-memory state and is reset on refresh.
-- Event images accept one JPEG, PNG, or WebP file up to 5 MB.
-- The visible product label is `Ventra`.
-- No legacy UI or backward compatibility is required because this workspace is
-  new.
+- One reservation holds one ticket of one type. Reservations send an
+  `Idempotency-Key` so a retry can't double-book.
+- Only `USER` accounts can reserve. Admin accounts can't.
+- There are no payments. Prices are informational.
+- Sign-up requires a 6-digit email code before the first sign-in.
+- Drafts are editable. Published events lock their details and ticket types.
+- Cancelling an event leaves ticket rows as they were. The UI treats tickets for
+  a cancelled event as void.
+- Cover images are HTTPS links. There's no upload endpoint yet. Events without a
+  cover fall back to local category photos in `public/events/`.
+- No password reset or profile editing yet. The API doesn't support them.
 
 ## Brand Commitments
 
-- Use the literal product label `Ventra` during this build.
-- Keep copy focused on discovery, event details, and making a new event.
-
-## Evidence on Hand
-
-No real event catalogue, organizer identities, ticketing data, customer proof,
-or production media has been supplied. Seeded content and imagery must remain
-clearly demonstrative and replaceable.
+- The product label is `Ventra`.
+- Headlines keep the existing voice: "Find a plan you will be glad you made.",
+  "Keep your next plan close.", "Make room for a good plan."
 
 ## Product Principles
 
-- Make the event content immediately understandable.
-- Let imagery and metadata carry the discovery experience.
-- Keep interactions direct, reversible, and keyboard-accessible.
-- Build the first end-to-end slice without persistence that the product does
-  not yet require.
+- Let the event photo carry the screen. Controls sit on frosted panels.
+- Tell people what happened, in plain words, after every action.
+- Keep actions reachable with a thumb on phones: bottom tab bar and bottom
+  action bars.
+- Treat the API as the authority for permissions, inventory and ticket status.
 
 ## Accessibility & Inclusion
 
-The web surface must provide keyboard access, visible focus, readable contrast,
-semantic labels, Escape and outside-click close behavior, reduced-motion
-support, and responsive layouts without clipped content.
+Keyboard access, visible focus, 44px minimum touch targets, labelled inputs with
+linked error messages, readable contrast for text on photos (always over a
+scrim), reduced-motion support, and layouts that hold at 320px wide.

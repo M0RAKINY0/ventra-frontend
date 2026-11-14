@@ -152,3 +152,306 @@ img {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Photo-first app (src/pages). Kept separate from the landing page tokens above. ---- */
+
+
+:root {
+  --paper: #f4f6f2;
+  --paper-deep: #e6ebe4;
+  --line: #e3e9e2;
+  --line-strong: #d5ddd4;
+  --ink: #17231f;
+  --ink-soft: #3d4b45;
+  --subtle: #5e6f68;
+  --night: #0e1513;
+  --cream: #fffdf7;
+  --cobalt: #2148d8;
+  --tangerine: #f36c42;
+  --leaf: #a8d56f;
+  --lime: #e4efc9;
+  --danger: #bf4438;
+  --font-sans: "DM Sans", "Segoe UI", Arial, sans-serif;
+  --font-display: "Archivo Black", "Arial Black", sans-serif;
+  --font-mono: "Space Mono", "Cascadia Mono", Consolas, monospace;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-subtle: var(--subtle);
+  --color-night: var(--night);
+  --color-cream: var(--cream);
+  --color-cobalt: var(--cobalt);
+  --color-tangerine: var(--tangerine);
+  --color-leaf: var(--leaf);
+  --color-lime: var(--lime);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--paper);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 2px;
+}
+
+.on-photo :focus-visible {
+  outline-color: var(--leaf);
+}
+
+@layer components {
+  /* Frosted panel that sits over photography. */
+  .glass {
+    background: rgb(255 253 247 / 0.16);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgb(255 255 255 / 0.32);
+    color: #fff;
+  }
+
+  /* Light frosted bar used for the mobile tab bar and sticky actions. */
+  .frost {
+    background: rgb(255 253 247 / 0.9);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+  }
+
+  .scrim-hero {
+    background: linear-gradient(
+      to bottom,
+      rgb(10 16 14 / 0.55) 0%,
+      rgb(10 16 14 / 0) 28%,
+      rgb(10 16 14 / 0.1) 50%,
+      rgb(10 16 14 / 0.88) 100%
+    );
+  }
+
+  .scrim-bottom {
+    background: linear-gradient(to top, rgb(10 16 14 / 0.88), rgb(10 16 14 / 0) 60%);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0 1.5rem;
+    border-radius: 999px;
+    border: 0;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 150ms;
+  }
+
+  .pill:disabled,
+  .pill[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pill-dark {
+    background: var(--ink);
+    color: var(--cream);
+  }
+
+  .pill-dark:not(:disabled):hover {
+    background: #2c3a35;
+  }
+
+  .pill-light {
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .pill-light:not(:disabled):hover {
+    background: #eef1eb;
+  }
+
+  .pill-soft {
+    background: #eef1eb;
+    color: var(--ink);
+  }
+
+  .pill-soft:not(:disabled):hover {
+    background: #dfe6dd;
+  }
+
+  .pill-danger-soft {
+    background: #fbe4df;
+    color: #8f2f25;
+  }
+
+  .pill-danger-soft:not(:disabled):hover {
+    background: #f8dcd6;
+  }
+
+  .pill-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+
+  .pill-danger:not(:disabled):hover {
+    background: #a33a2f;
+  }
+
+  .chip {
+    min-height: 2.75rem;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    color: var(--ink);
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .chip:hover {
+    border-color: var(--ink);
+  }
+
+  .chip[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--cream);
+  }
+
+  .segmented {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--paper-deep);
+  }
+
+  .segmented > button {
+    flex: 1;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--subtle);
+    white-space: nowrap;
+  }
+
+  .segmented > button[aria-selected="true"],
+  .segmented > button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--cream);
+  }
+
+  .field {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--line);
+    border-radius: 1rem;
+    background: #fff;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+
+  .field:focus {
+    outline: 0;
+    border-color: var(--ink);
+  }
+
+  .field:disabled {
+    background: #eef1eb;
+    color: var(--subtle);
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 1.6rem;
+  }
+
+  .sr-only-safe {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes ventra-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: ventra-spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

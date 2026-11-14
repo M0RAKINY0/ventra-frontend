@@ -1,23 +1,32 @@
 # Ventra Frontend
 
-Ventra Frontend is the client-only Vite + React + TypeScript event-discovery app. This `inviting-baseline` branch keeps the previous landing-page composition while applying the current Ventra logo, voice, palette, typography, and footer treatment for visual comparison. It presents local demo plans, opens event details, explains the browse-to-create journey, lets a user publish an event with an image preview, and includes a split-screen `/login` experience with sign-in and sign-up demo states. New events live in memory and intentionally reset on refresh.
+The Ventra web app for finding events, reserving tickets, and running events on the night. It talks to the Ventra API in `ticketflow-source` and uses the photo-first design described in `DESIGN.md`. The same pages work on phones and desktops.
 
-## Stack
+The home page at `/` is the Figma landing page (`src/pages/LandingPage.tsx`, with sections in `src/components/hero` and `src/components/home`, styled by `src/App.css`). It still runs on the demo events in `src/data/events.ts`. Browse with live events is at `/events`.
 
-- Vite, React, TypeScript
-- Tailwind CSS v4 and shadcn/ui primitives
-- Aceternity animated testimonials, expandable-card, Apple cards carousel, and file-upload foundations
-- Motion for interaction transitions
-- Oxlint and Vitest for checks
+## What it does
 
-## Run It
+- Browse published events with search, category and date filters.
+- Reserve one ticket per reservation, then show its QR code at the door.
+- Sign up with email and a 6-digit code, log in with email or Google, and sign out.
+- Create draft events, add ticket types, publish, and cancel (Hosting).
+- Check people in by scanning ticket QR codes with the camera, or by pasting the code.
+- Admins can change user roles and cancel any event.
+
+Ventra doesn't take payments. Reserving holds a spot.
+
+## Run it
+
+Start the API first (see `ticketflow-source/README.md`). It needs PostgreSQL, Redis, and a `.env` with `FRONTEND_ORIGINS=http://localhost:5173`. Then:
 
 ```bash
 npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173/` by default.
+The app runs at `http://localhost:5173/`. In development, Vite forwards `/api` requests to `http://localhost:4000`, so the Better Auth session cookie works without CORS changes. Set `VENTRA_API_PROXY_TARGET` to point the proxy somewhere else.
+
+For a production build served from a different origin than the API, set `VITE_API_URL` at build time and add the frontend origin to the API's `FRONTEND_ORIGINS`.
 
 ## Checks
 
@@ -27,23 +36,15 @@ npm run lint
 npm run build
 ```
 
-## Product Structure
+## Structure
 
-- `src/types/events.ts` contains the event and draft contracts.
-- `src/types/auth.ts` contains the auth mode and visual preview mode contracts.
-- `src/data/events.ts` contains the five seeded demo events and three how-it-works steps.
-- `src/components/events/` contains the extracted event primitives and feature adapters, including the shared create form and compact wheel pickers.
-- `src/components/auth/` contains the reusable auth form and event-led visual panel used by `/login`.
-- `src/components/ui/` contains shadcn and Aceternity-derived primitives.
-- `public/events/` contains local demo photography so the experience does not depend on a remote image service.
-- `DESIGN.md` records the visual system used by this comparison branch.
+- `src/lib/api.ts` is the typed API client. Errors come back as `ApiError` with the API's `code`.
+- `src/lib/auth.ts` wraps the Better Auth endpoints under `/api/v1/auth`.
+- `src/lib/session.tsx` loads the signed-in user from `/api/v1/me`.
+- `src/lib/router.tsx` is a small history router. Routes live in `src/App.tsx`.
+- `src/lib/datetime.ts` converts between event-local wall-clock times and UTC.
+- `src/components/shell.tsx` has the photo header, glass navigation, and the phone tab bar.
+- `src/pages/` has one file per screen.
+- `public/events/` holds category photos used when an event has no cover image.
 
-Event details open from the full browse-card surface and use a shared blurred dialog. The Reserve event action routes to `/login`; authentication is intentionally not connected yet. The auth page supports sign-in and sign-up modes, a clearly labeled demo Google action, native email validation with inline feedback, and three visual preview treatments without creating sessions or persisting credentials. The How it works cards remain static while their Apple carousel track stays horizontally navigable. The `Put it on the map` section renders the reusable create form inline, while the header and hero shortcuts open the same form in a drawer. The hero media stack stays contained inside its white frame, and the create form pairs related fields to keep the interface compact.
-
-## Image Upload
-
-The create form accepts one JPEG, PNG, or WebP image up to 5 MB. Dates and times are selected with compact iOS-inspired wheel controls rather than typed manually; the date month wheel shows each available month once and keeps its selected day linked. The preview uses a local object URL, supports replacement and removal, and is owned by the in-memory event after publish. There is no backend or persistent storage in this slice.
-
-## Comparison Branch
-
-The `inviting-baseline` branch is intentionally separate from the `redesign` route-board branch. It is a preview branch for evaluating the current Ventra colors, fonts, and footer on the earlier landing-page layout; it is not intended to merge the two page structures automatically.
+Camera scanning uses the browser's `BarcodeDetector`, which Chrome on Android supports. Browsers without it, including Safari and Firefox, show a paste box instead.
