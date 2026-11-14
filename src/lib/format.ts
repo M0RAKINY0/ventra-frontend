@@ -126,6 +126,11 @@ export function errorMessage(error: unknown): string {
   return "Something went wrong. Try again."
 }
 
+/** The page for one reservation. `save` saves it to the account as soon as a signed-in buyer lands there. */
+export function reservationPath(reservation: { id: string; accessToken: string }, save = false): string {
+  return `/reservations/${reservation.id}?token=${encodeURIComponent(reservation.accessToken)}${save ? "&save=1" : ""}`
+}
+
 /** Short, human-checkable code shown under a QR. The full payload stays in the QR. */
 export function ticketCode(publicId: string): string {
   const core = publicId.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 8)

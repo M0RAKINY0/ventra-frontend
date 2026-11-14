@@ -142,7 +142,7 @@ function Scanner({ event }: { event: VentraEvent }) {
   }[result.kind]
   const detail =
     result.kind === "ok"
-      ? `${result.checkIn.ticket.reservation.user.name} · ${result.checkIn.ticket.reservation.ticketType.name}. Let them in.`
+      ? `${result.checkIn.ticket.reservation.buyerName} · ${result.checkIn.ticket.ticketType.name}. Let them in.`
       : result.kind === "idle"
         ? "Scan a ticket QR, or paste the code from it."
         : result.message
@@ -192,11 +192,11 @@ function Scanner({ event }: { event: VentraEvent }) {
               {(checkIns.data ?? []).slice(0, 6).map((item) => (
                 <li key={item.id} className="flex items-center gap-3">
                   <span aria-hidden="true" className="flex size-10 flex-none items-center justify-center rounded-full bg-white text-[13px] font-bold text-ink">
-                    {initials(item.ticket.reservation.user.name)}
+                    {initials(item.ticket.reservation.buyerName)}
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-bold">{item.ticket.reservation.user.name}</span>
-                    <span className="text-[13px] text-white/70">{item.ticket.reservation.ticketType.name}</span>
+                    <span className="truncate font-bold">{item.ticket.reservation.buyerName}</span>
+                    <span className="text-[13px] text-white/70">{item.ticket.ticketType.name}</span>
                   </span>
                   <span className="text-[13px] text-white/70">{time(item.checkedInAt, event.timezone)}</span>
                 </li>

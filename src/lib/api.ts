@@ -4,6 +4,7 @@ import type {
   EventInput,
   Paginated,
   Reservation,
+  ReservationInput,
   Role,
   Ticket,
   TicketType,
@@ -142,11 +143,25 @@ export const api = {
     request<void>(`/api/v1/events/${eventId}/ticket-types/${ticketTypeId}`, { method: "DELETE" }),
 
   /** The idempotency key must stay the same when retrying the same reservation. */
-  reserve: (eventId: string, ticketTypeId: string, idempotencyKey: string) =>
+  reserve: (eventId: string, input: ReservationInput, idempotencyKey: string) =>
     request<{ reservation: Reservation }>(`/api/v1/events/${eventId}/reservations`, {
       method: "POST",
-      body: { ticketTypeId },
+      body: input,
       headers: { "Idempotency-Key": idempotencyKey },
+    }).then((r) => r.reservation),
+
+  /** Guests pass the access token from their email link. Signed-in owners can pass null. */
+  getReservation: (reservationId: string, token: string | null, signal?: AbortSignal) =>
+    request<{ reservation: Reservation }>(
+      `/api/v1/reservations/${encodeURIComponent(reservationId)}${query({ token: token ?? undefined })}`,
+      { signal },
+    ).then((r) => r.reservation),
+
+  /** Saves a guest reservation to the signed-in account, so it also shows under My tickets. */
+  claimReservation: (reservationId: string, token: string) =>
+    request<{ reservation: Reservation }>(`/api/v1/reservations/${encodeURIComponent(reservationId)}/claim`, {
+      method: "POST",
+      body: { token },
     }).then((r) => r.reservation),
 
   listTickets: (signal?: AbortSignal) =>

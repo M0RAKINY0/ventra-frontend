@@ -106,7 +106,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="text-[22px] font-bold leading-tight">{event.title}</span>
           <span className="text-sm text-white/85">
-            {ticket.reservation.ticketType.name} · {event.venue}
+            {ticket.ticketType.name} · {event.venue}
           </span>
         </span>
         <span aria-hidden="true" className="flex size-11 flex-none items-center justify-center rounded-full bg-white text-ink">
@@ -217,11 +217,11 @@ function TicketBody({ ticket }: { ticket: Ticket }) {
         <dl className="m-0 grid w-full grid-cols-2 gap-3.5 border-t border-line pt-4">
           <div>
             <dt className="text-xs text-subtle">Ticket</dt>
-            <dd className="m-0 font-bold">{ticket.reservation.ticketType.name}</dd>
+            <dd className="m-0 font-bold">{ticket.ticketType.name}</dd>
           </div>
           <div>
             <dt className="text-xs text-subtle">Price</dt>
-            <dd className="m-0 font-bold">{money(ticket.reservation.ticketType.price, event.currency)}</dd>
+            <dd className="m-0 font-bold">{money(ticket.ticketType.price, event.currency)}</dd>
           </div>
           <div>
             <dt className="text-xs text-subtle">Date</dt>
