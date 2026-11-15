@@ -37,7 +37,17 @@ npm run dev
 
 The app runs at `http://localhost:5173/`. In development, Vite forwards `/api` requests to `http://localhost:4000`, so the Better Auth session cookie works without CORS changes. Set `VENTRA_API_PROXY_TARGET` to point the proxy somewhere else.
 
-For a production build served from a different origin than the API, set `VITE_API_URL` at build time and add the frontend origin to the API's `FRONTEND_ORIGINS`.
+For a production build served from a different origin than the API, set `VITE_API_URL` at build time and add the frontend origin to the API's `FRONTEND_ORIGINS`. The API builds ticket email links from the first origin in that list, and password reset only works from origins on it.
+
+### Checkout bot check
+
+The API verifies a Cloudflare Turnstile token before it holds tickets. Set `VITE_TURNSTILE_SITE_KEY` at build time to the site key that pairs with the API's `TURNSTILE_SECRET_KEY`. The event page then shows the widget with action `checkout` and sends its token as `turnstileToken`. Every attempt uses a fresh token.
+
+Leave the variable unset in development. No widget shows and no token goes out, which the API accepts only when it has no Turnstile secret and isn't in production mode.
+
+### Hosting
+
+`vercel.json` sends every path to `index.html`, so links like `/e/my-event` and the emailed reset and ticket links open directly. Another static host needs the same fallback.
 
 ## Checks
 

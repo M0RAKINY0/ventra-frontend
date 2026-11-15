@@ -2,6 +2,7 @@ import { ArrowLeft, CalendarDays, MapPin, Minus, Plus } from "lucide-react"
 import { useRef, useState, type FormEvent } from "react"
 import { Container, ErrorState, FieldLabel, Loading, Notice, Sheet } from "@/components/common"
 import { ShareLink } from "@/components/ShareLink"
+import { TurnstileWidget } from "@/components/TurnstileWidget"
 import { PhotoHero } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/lib/format"
 import { Link, useRouter } from "@/lib/router"
 import { useSession } from "@/lib/session"
+import { TURNSTILE_SITE_KEY } from "@/lib/turnstile"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
 import type { Reservation, VentraEvent } from "@/types/api"
@@ -91,6 +93,10 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
   const [reservation, setReservation] = useState<Reservation | null>(null)
   // One key per attempt, so a retry after a network failure can't double-book.
   const idempotencyKey = useRef(crypto.randomUUID())
+  // The API checks a Turnstile token before it holds tickets. A token works
+  // once, so every attempt, retries included, ends by running a new challenge.
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [challenge, setChallenge] = useState(0)
 
   function selectType(ticketTypeId: string) {
     setSelectedId(ticketTypeId)
@@ -113,10 +119,11 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
   const maxQuantity = selected ? Math.min(MAX_TICKETS, remaining(selected)) : 0
   const canReserve = Boolean(!isAdmin && !cancelled && !draft && selected && maxQuantity > 0)
   const total = selected ? money(Number(selected.price) * quantity, event.currency) : null
+  const awaitingCheck = Boolean(TURNSTILE_SITE_KEY) && !turnstileToken
 
   async function reserve(submitEvent: FormEvent<HTMLFormElement>) {
     submitEvent.preventDefault()
-    if (!selected || !canReserve) return
+    if (!selected || !canReserve || awaitingCheck) return
     setBusy(true)
     setError(null)
     try {
@@ -126,6 +133,7 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
           items: [{ ticketTypeId: selected.id, quantity }],
           // Signed-in buyers reserve under their account.
           buyer: user ? undefined : { name: guestName, email: guestEmail },
+          turnstileToken: turnstileToken ?? undefined,
         },
         idempotencyKey.current,
       )
@@ -141,17 +149,28 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
       }
     } finally {
       setBusy(false)
+      if (TURNSTILE_SITE_KEY) {
+        setTurnstileToken(null)
+        setChallenge((count) => count + 1)
+      }
     }
   }
 
   // Both buttons submit the same form, so the mobile bar also validates the guest fields.
   const reserveAction = (
-    <button type="submit" form="reserve-form" className="pill pill-dark w-full" disabled={!canReserve || busy}>
+    <button
+      type="submit"
+      form="reserve-form"
+      className="pill pill-dark w-full"
+      disabled={!canReserve || busy || awaitingCheck}
+    >
       {busy
         ? "Reserving…"
         : cancelled
           ? "Reservations closed"
-          : total
+          : canReserve && awaitingCheck
+            ? "Checking…"
+            : total
             ? `Reserve ${quantity > 1 ? `${quantity} ` : ""}· ${total}`
             : "Reserve"}
     </button>
@@ -371,6 +390,15 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
                   </span>
                 </div>
               </div>
+            ) : null}
+
+            {canReserve && TURNSTILE_SITE_KEY ? (
+              <TurnstileWidget
+                siteKey={TURNSTILE_SITE_KEY}
+                action="checkout"
+                resetKey={challenge}
+                onToken={setTurnstileToken}
+              />
             ) : null}
 
             {error ? <Notice tone="danger">{error}</Notice> : null}

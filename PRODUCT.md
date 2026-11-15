@@ -58,9 +58,10 @@ The interface stays out of the way on frosted panels.
   `/account`. Email addresses can't be changed yet.
 - `/terms` and `/privacy` are laid out but hold draft text, in
   `src/content/legal.ts`.
-- Not built yet: payment and payout pages, an organizer storefront that
-  lists one organizer's events, and the Turnstile widget the API expects at
-  checkout in production.
+- Checkout runs a Cloudflare Turnstile check when `VITE_TURNSTILE_SITE_KEY`
+  is set. The API rejects production reservations without its token.
+- Not built yet: payment and payout pages, and an organizer storefront that
+  lists one organizer's events.
 
 ## Brand Commitments
 

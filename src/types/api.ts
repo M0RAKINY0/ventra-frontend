@@ -132,6 +132,8 @@ export type ReservationInput = {
   items: { ticketTypeId: string; quantity: number }[]
   /** Required for guests. The API ignores it for signed-in buyers. */
   buyer?: { name: string; email: string }
+  /** From the Turnstile widget. Each attempt needs a fresh one, retries included. */
+  turnstileToken?: string
 }
 
 /** Reservation totals for one event. Amounts are decimal strings, like "5000.00". */
