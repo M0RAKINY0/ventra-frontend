@@ -1,83 +1,78 @@
-import { useEffect, useState } from "react"
-import "./App.css"
-import { CreateEventDrawer } from "@/components/events/CreateEventDrawer"
-import { EventDetailDialog } from "@/components/events/EventDetailDialog"
-import { LoginPage } from "@/components/events/LoginPage"
-import { VentraHero } from "@/components/hero/VentraHero"
-import { AudienceSection } from "@/components/home/AudienceSection"
-import { FaqSection } from "@/components/home/FaqSection"
-import { GlobeSection } from "@/components/home/GlobeSection"
-import { HowToUseSection } from "@/components/home/HowToUseSection"
-import { SharePlanSection } from "@/components/home/SharePlanSection"
-import { SiteFooter } from "@/components/home/SiteFooter"
-import { demoEvents } from "@/data/events"
-import { buildEventFromDraft } from "@/lib/event-draft"
-import type { Event, EventDraft } from "@/types/events"
+import { useEffect, type ReactNode } from "react"
+import { MobileTabBar } from "@/components/shell"
+import { Loading } from "@/components/common"
+import { RouterProvider, matchPath, useRouter } from "@/lib/router"
+import { SessionProvider, useSession } from "@/lib/session"
+import { AdminPage } from "@/pages/AdminPage"
+import { LoginPage, VerifyPage } from "@/pages/AuthPages"
+import { BrowsePage } from "@/pages/BrowsePage"
+import { CheckInPage } from "@/pages/CheckInPage"
+import { EventPage } from "@/pages/EventPage"
+import { HostingPage } from "@/pages/HostingPage"
+import { LandingPage } from "@/pages/LandingPage"
+import { ManageEventPage } from "@/pages/ManageEventPage"
+import { NotFoundPage } from "@/pages/StatusPages"
+import { TicketPage, TicketsPage } from "@/pages/TicketPages"
 
-function App() {
-  const [events, setEvents] = useState<Event[]>(demoEvents)
-  const [activeEventId, setActiveEventId] = useState(demoEvents[0].id)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
-  const [pathname, setPathname] = useState(() => window.location.pathname)
+/** Sends signed-out visitors to log in, then back to where they were going. */
+function RequireAuth({ children }: { children: ReactNode }) {
+  const { user, status } = useSession()
+  const { pathname, search, navigate } = useRouter()
+  const target = `${pathname}${search.toString() ? `?${search.toString()}` : ""}`
 
   useEffect(() => {
-    const handlePopState = () => setPathname(window.location.pathname)
-    window.addEventListener("popstate", handlePopState)
+    if (status === "ready" && !user) navigate(`/login?next=${encodeURIComponent(target)}`, { replace: true })
+  }, [status, user, navigate, target])
 
-    return () => window.removeEventListener("popstate", handlePopState)
-  }, [])
+  if (status === "loading" || !user) return <Loading label="Checking your session" className="min-h-screen" />
+  return <>{children}</>
+}
 
-  const navigateTo = (nextPath: string) => {
-    window.history.pushState({}, "", nextPath)
-    setPathname(nextPath)
-    setSelectedEvent(null)
+type Route = { pattern: string; render: (params: Record<string, string>) => ReactNode; auth?: boolean; tabBar?: boolean }
+
+const ROUTES: Route[] = [
+  { pattern: "/", render: () => <LandingPage /> },
+  { pattern: "/events", render: () => <BrowsePage />, tabBar: true },
+  { pattern: "/events/:eventId", render: (p) => <EventPage eventId={p.eventId} /> },
+  { pattern: "/login", render: () => <LoginPage /> },
+  { pattern: "/verify", render: () => <VerifyPage /> },
+  { pattern: "/tickets", render: () => <TicketsPage />, auth: true, tabBar: true },
+  { pattern: "/tickets/:ticketId", render: (p) => <TicketPage ticketId={p.ticketId} />, auth: true },
+  { pattern: "/hosting", render: () => <HostingPage />, auth: true, tabBar: true },
+  { pattern: "/hosting/new", render: () => <ManageEventPage />, auth: true },
+  { pattern: "/hosting/:eventId", render: (p) => <ManageEventPage eventId={p.eventId} />, auth: true },
+  { pattern: "/check-in", render: () => <CheckInPage />, auth: true, tabBar: true },
+  { pattern: "/admin", render: () => <AdminPage />, auth: true, tabBar: true },
+]
+
+function resolveRoute(pathname: string): { route: Route; params: Record<string, string> } | null {
+  for (const route of ROUTES) {
+    const params = matchPath(route.pattern, pathname)
+    if (params) return { route, params }
   }
+  return null
+}
 
-  const handleCreate = (draft: EventDraft) => {
-    const event = buildEventFromDraft(draft, `event-${crypto.randomUUID()}`)
-    setEvents((previousEvents) => [...previousEvents, event])
-    setActiveEventId(event.id)
-  }
+function Routes() {
+  const { pathname } = useRouter()
+  const match = resolveRoute(pathname)
 
-  const handleReserve = () => navigateTo("/login")
-
-  if (pathname === "/login") {
-    return <LoginPage featuredEvent={events[0] ?? demoEvents[0]} onBack={() => navigateTo("/")} />
-  }
-
+  if (!match) return <NotFoundPage />
+  const page = match.route.render(match.params)
   return (
-    <div className="events-app" id="top">
-      <main>
-        <VentraHero
-          activeEventId={activeEventId}
-          events={events}
-          onActiveChange={setActiveEventId}
-          onCreate={() => setIsCreateOpen(true)}
-          onOpen={setSelectedEvent}
-        />
-
-        <AudienceSection />
-        <GlobeSection events={events} />
-        <HowToUseSection />
-        <FaqSection />
-        <SharePlanSection onCreate={handleCreate} />
-      </main>
-
-      <SiteFooter onNavigate={navigateTo} />
-
-      <CreateEventDrawer
-        onCreate={handleCreate}
-        onOpenChange={setIsCreateOpen}
-        open={isCreateOpen}
-      />
-      <EventDetailDialog
-        event={selectedEvent}
-        onClose={() => setSelectedEvent(null)}
-        onReserve={handleReserve}
-      />
-    </div>
+    <>
+      {match.route.auth ? <RequireAuth>{page}</RequireAuth> : page}
+      {match.route.tabBar ? <MobileTabBar /> : null}
+    </>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <RouterProvider>
+      <SessionProvider>
+        <Routes />
+      </SessionProvider>
+    </RouterProvider>
+  )
+}
