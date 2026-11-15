@@ -92,31 +92,44 @@ type EventSummary = Omit<VentraEvent, "organizer" | "ticketTypes">
 export type Ticket = {
   id: string
   reservationId: string
+  ticketTypeId: string
   publicId: string
   status: TicketStatus
   qrCodeDataUrl: string | null
   qrPayload: string
   createdAt: string
+  ticketType: TicketType
   reservation: {
     id: string
     eventId: string
-    ticketTypeId: string
     status: "CONFIRMED" | "CANCELLED"
     createdAt: string
     event: EventSummary
-    ticketType: TicketType
   }
   checkIn: { id: string; checkedInAt: string } | null
 }
 
+export type ReservationTicket = Omit<Ticket, "reservation" | "checkIn">
+
+/** One checkout. `userId` is null when a guest reserved without an account. */
 export type Reservation = {
   id: string
   eventId: string
-  ticketTypeId: string
+  userId: string | null
+  buyerEmail: string
+  buyerName: string
   status: "CONFIRMED" | "CANCELLED"
+  createdAt: string
   event: EventSummary
-  ticketType: TicketType
-  ticket: Omit<Ticket, "reservation" | "checkIn"> | null
+  tickets: ReservationTicket[]
+  /** Opens this reservation without signing in. Treat it like a password. */
+  accessToken: string
+}
+
+export type ReservationInput = {
+  items: { ticketTypeId: string; quantity: number }[]
+  /** Required for guests. The API ignores it for signed-in buyers. */
+  buyer?: { name: string; email: string }
 }
 
 export type CheckIn = {
@@ -128,9 +141,7 @@ export type CheckIn = {
   ticket: {
     id: string
     publicId: string
-    reservation: {
-      user: { id: string; name: string; email: string }
-      ticketType: TicketType
-    }
+    ticketType: TicketType
+    reservation: { id: string; buyerName: string; buyerEmail: string }
   }
 }

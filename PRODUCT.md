@@ -29,9 +29,16 @@ The interface stays out of the way on frosted panels.
 
 ## Capabilities and Constraints
 
-- One reservation holds one ticket of one type. Reservations send an
-  `Idempotency-Key` so a retry can't double-book.
-- Only `USER` accounts can reserve. Admin accounts can't.
+- One reservation holds up to 10 tickets. The API accepts several ticket
+  types per reservation, and the event page sends one type at a time.
+  Reservations send an `Idempotency-Key` so a retry can't double-book.
+- Guests reserve with a name and email and no account. Their ticket email
+  links to `/reservations/:id?token=...`, which shows every QR code.
+  Signed-in `USER` accounts reserve under their account. Admin accounts
+  can't reserve.
+- Signing in is optional at every step. A guest who signs in afterwards can
+  save the reservation to their account, so the tickets live in both the
+  email and My tickets.
 - There are no payments. Prices are informational.
 - Sign-up requires a 6-digit email code before the first sign-in.
 - Drafts are editable. Published events lock their details and ticket types.

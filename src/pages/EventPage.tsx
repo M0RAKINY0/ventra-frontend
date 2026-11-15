@@ -1,6 +1,6 @@
-import { ArrowLeft, CalendarDays, MapPin } from "lucide-react"
-import { useRef, useState } from "react"
-import { Container, ErrorState, Loading, Notice, Sheet } from "@/components/common"
+import { ArrowLeft, CalendarDays, MapPin, Minus, Plus } from "lucide-react"
+import { useRef, useState, type FormEvent } from "react"
+import { Container, ErrorState, FieldLabel, Loading, Notice, Sheet } from "@/components/common"
 import { PhotoHero } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
 import {
@@ -10,6 +10,7 @@ import {
   longDate,
   money,
   remaining,
+  reservationPath,
   shortDate,
   timeRange,
 } from "@/lib/format"
@@ -19,6 +20,9 @@ import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
 import type { Reservation, VentraEvent } from "@/types/api"
 import { NotFoundPage } from "@/pages/StatusPages"
+
+/** Matches the API's limit on tickets per reservation. */
+const MAX_TICKETS = 10
 
 export function EventPage({ eventId }: { eventId: string }) {
   const event = useAsync((signal) => api.getEvent(eventId, signal), [eventId])
@@ -69,6 +73,9 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
   const { pathname } = useRouter()
   const firstAvailable = event.ticketTypes.find((type) => remaining(type) > 0)
   const [selectedId, setSelectedId] = useState(firstAvailable?.id ?? "")
+  const [quantity, setQuantity] = useState(1)
+  const [guestName, setGuestName] = useState("")
+  const [guestEmail, setGuestEmail] = useState("")
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [reservation, setReservation] = useState<Reservation | null>(null)
@@ -77,43 +84,76 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
 
   function selectType(ticketTypeId: string) {
     setSelectedId(ticketTypeId)
+    setQuantity(1)
+    setError(null)
+    idempotencyKey.current = crypto.randomUUID()
+  }
+
+  function changeQuantity(next: number) {
+    setQuantity(next)
     setError(null)
     idempotencyKey.current = crypto.randomUUID()
   }
 
   const selected = event.ticketTypes.find((type) => type.id === selectedId)
   const isOwner = user?.id === event.organizerId
+  const isAdmin = user?.role === "ADMIN"
   const cancelled = event.status === "CANCELLED"
   const draft = event.status === "DRAFT"
-  const canReserve = Boolean(user && user.role === "USER" && !cancelled && !draft && selected && remaining(selected) > 0)
+  const maxQuantity = selected ? Math.min(MAX_TICKETS, remaining(selected)) : 0
+  const canReserve = Boolean(!isAdmin && !cancelled && !draft && selected && maxQuantity > 0)
+  const total = selected ? money(Number(selected.price) * quantity, event.currency) : null
 
-  async function reserve() {
-    if (!selected) return
+  async function reserve(submitEvent: FormEvent<HTMLFormElement>) {
+    submitEvent.preventDefault()
+    if (!selected || !canReserve) return
     setBusy(true)
     setError(null)
     try {
-      const result = await api.reserve(event.id, selected.id, idempotencyKey.current)
+      const result = await api.reserve(
+        event.id,
+        {
+          items: [{ ticketTypeId: selected.id, quantity }],
+          // Signed-in buyers reserve under their account.
+          buyer: user ? undefined : { name: guestName, email: guestEmail },
+        },
+        idempotencyKey.current,
+      )
       setReservation(result)
       idempotencyKey.current = crypto.randomUUID()
       onChanged()
     } catch (caught) {
       setError(errorMessage(caught))
       if (caught instanceof ApiError && caught.status !== 0) idempotencyKey.current = crypto.randomUUID()
-      if (caught instanceof ApiError && caught.code === "TICKET_TYPE_SOLD_OUT") onChanged()
+      if (caught instanceof ApiError && (caught.code === "TICKET_TYPE_SOLD_OUT" || caught.code === "NOT_ENOUGH_TICKETS")) {
+        setQuantity(1)
+        onChanged()
+      }
     } finally {
       setBusy(false)
     }
   }
 
-  const reserveAction = !user ? (
-    <Link to={`/login?next=${encodeURIComponent(pathname)}`} className="pill pill-dark w-full">
-      Log in to reserve
-    </Link>
-  ) : (
-    <button type="button" className="pill pill-dark w-full" disabled={!canReserve || busy} onClick={reserve}>
-      {busy ? "Reserving…" : cancelled ? "Reservations closed" : selected ? `Reserve · ${money(selected.price, event.currency)}` : "Reserve"}
+  // Both buttons submit the same form, so the mobile bar also validates the guest fields.
+  const reserveAction = (
+    <button type="submit" form="reserve-form" className="pill pill-dark w-full" disabled={!canReserve || busy}>
+      {busy
+        ? "Reserving…"
+        : cancelled
+          ? "Reservations closed"
+          : total
+            ? `Reserve ${quantity > 1 ? `${quantity} ` : ""}· ${total}`
+            : "Reserve"}
     </button>
   )
+
+  const reservedTickets = reservation?.tickets ?? []
+  const ticketsLink =
+    reservation && !user
+      ? reservationPath(reservation)
+      : reservedTickets.length === 1
+        ? `/tickets/${reservedTickets[0].id}`
+        : "/tickets"
 
   return (
     <div className="flex flex-wrap items-start gap-8 lg:gap-10">
@@ -169,26 +209,36 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
               <span className="relative flex flex-col gap-2 p-6">
                 <strong className="font-display text-3xl">You're in.</strong>
                 <span className="leading-relaxed">
-                  {reservation.ticketType.name} for {shortDate(event.startsAt, event.timezone)}. Your QR code is ready, and we're
-                  emailing it to {user?.email}.
+                  {reservedTickets.length > 1 ? `${reservedTickets.length} × ` : ""}
+                  {reservedTickets[0]?.ticketType.name} for {shortDate(event.startsAt, event.timezone)}.{" "}
+                  {reservedTickets.length > 1 ? "Your QR codes are ready, and we're emailing them" : "Your QR code is ready, and we're emailing it"}{" "}
+                  to {reservation.buyerEmail}.
                 </span>
               </span>
             </div>
-            {reservation.ticket ? (
-              <Link to={`/tickets/${reservation.ticket.id}`} className="pill pill-dark w-full">
-                View ticket
-              </Link>
-            ) : (
-              <Link to="/tickets" className="pill pill-dark w-full">
-                My tickets
-              </Link>
-            )}
+            <Link to={ticketsLink} className="pill pill-dark w-full">
+              {reservedTickets.length > 1 ? "View tickets" : "View ticket"}
+            </Link>
+            {!user ? (
+              <>
+                <Link
+                  to={`/login?mode=signup&next=${encodeURIComponent(reservationPath(reservation, true))}`}
+                  className="pill pill-soft w-full"
+                >
+                  Save to an account too
+                </Link>
+                <p className="m-0 text-[13px] leading-normal text-subtle">
+                  Optional. Sign in and {reservedTickets.length > 1 ? "these tickets also show" : "this ticket also shows"}{" "}
+                  under My tickets. Your email has {reservedTickets.length > 1 ? "them" : "it"} either way.
+                </p>
+              </>
+            ) : null}
             <Link to="/events" className="pill pill-soft w-full">
               Keep browsing
             </Link>
           </div>
         ) : (
-          <>
+          <form id="reserve-form" className="flex flex-col gap-4" onSubmit={reserve}>
             <h2 id="reserve-title" className="m-0 text-[22px]">
               Pick a ticket
             </h2>
@@ -230,24 +280,100 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
                 })}
               </fieldset>
             )}
+
+            {canReserve ? (
+              <div className="flex items-center justify-between gap-3">
+                <span id="quantity-label" className="text-sm font-semibold text-ink-soft">
+                  How many?
+                </span>
+                <div role="group" aria-labelledby="quantity-label" className="flex items-center gap-1 rounded-full bg-paper p-1">
+                  <button
+                    type="button"
+                    aria-label="One fewer ticket"
+                    className="flex size-11 items-center justify-center rounded-full bg-white text-ink disabled:opacity-40"
+                    disabled={quantity <= 1}
+                    onClick={() => changeQuantity(quantity - 1)}
+                  >
+                    <Minus aria-hidden="true" size={18} />
+                  </button>
+                  <output aria-live="polite" className="min-w-9 text-center text-lg font-bold">
+                    {quantity}
+                  </output>
+                  <button
+                    type="button"
+                    aria-label="One more ticket"
+                    className="flex size-11 items-center justify-center rounded-full bg-white text-ink disabled:opacity-40"
+                    disabled={quantity >= maxQuantity}
+                    onClick={() => changeQuantity(quantity + 1)}
+                  >
+                    <Plus aria-hidden="true" size={18} />
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {canReserve && !user ? (
+              <div className="flex flex-col gap-3.5 border-t border-line pt-4">
+                <div className="flex items-center justify-between gap-3 rounded-[20px] bg-paper py-2 pl-4 pr-2">
+                  <span className="text-sm font-semibold text-ink-soft">Have an account?</span>
+                  <Link to={`/login?next=${encodeURIComponent(pathname)}`} className="pill pill-light">
+                    Log in
+                  </Link>
+                </div>
+                <span className="text-sm font-semibold text-ink-soft">Or continue as a guest</span>
+                <div className="flex flex-col gap-1.5">
+                  <FieldLabel htmlFor="guest-name">Full name</FieldLabel>
+                  <input
+                    id="guest-name"
+                    className="field"
+                    autoComplete="name"
+                    required
+                    maxLength={200}
+                    value={guestName}
+                    onChange={(change) => setGuestName(change.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <FieldLabel htmlFor="guest-email">Email</FieldLabel>
+                  <input
+                    id="guest-email"
+                    className="field"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    maxLength={254}
+                    value={guestEmail}
+                    onChange={(change) => setGuestEmail(change.target.value)}
+                    placeholder="you@example.com"
+                    aria-describedby="guest-email-hint"
+                  />
+                  <span id="guest-email-hint" className="text-[13px] text-subtle">
+                    We send your tickets here. You can save them to an account afterwards.
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
             {error ? <Notice tone="danger">{error}</Notice> : null}
-            {user?.role === "ADMIN" ? (
+            {isAdmin ? (
               <p className="m-0 text-sm text-subtle">Admin accounts can't reserve tickets. Use a regular account.</p>
             ) : null}
             <div className="hidden md:block">{reserveAction}</div>
             <p className="m-0 text-[13px] leading-normal text-subtle">
-              Ventra doesn't take payments yet. Reserving holds one spot in your name.
+              Ventra doesn't take payments yet. Reserving holds your spots.
               {isOwner ? " You're the organizer of this event." : ""}
             </p>
-          </>
+          </form>
         )}
       </aside>
 
       {!reservation ? (
         <div className="frost fixed inset-x-3.5 bottom-3.5 z-40 flex items-center gap-3 rounded-full py-2 pl-5 pr-2 shadow-[0_10px_30px_rgba(0,0,0,0.18)] md:hidden">
           <span className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-xs text-subtle">{selected?.name ?? "No ticket selected"}</span>
-            <span className="text-[17px] font-bold">{selected ? money(selected.price, event.currency) : "–"}</span>
+            <span className="truncate text-xs text-subtle">
+              {selected ? `${quantity > 1 ? `${quantity} × ` : ""}${selected.name}` : "No ticket selected"}
+            </span>
+            <span className="text-[17px] font-bold">{total ?? "–"}</span>
           </span>
           <div className="max-w-[60%] flex-none">{reserveAction}</div>
         </div>

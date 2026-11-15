@@ -689,8 +689,8 @@ function CheckInsPanel({ event }: { event: VentraEvent }) {
       {list.map((item, index) => (
         <li key={item.id} className={cn("flex flex-wrap items-center justify-between gap-3 px-5 py-4", index > 0 && "border-t border-line")}>
           <span className="flex flex-col">
-            <span className="font-bold">{item.ticket.reservation.user.name}</span>
-            <span className="text-sm text-subtle">{item.ticket.reservation.ticketType.name}</span>
+            <span className="font-bold">{item.ticket.reservation.buyerName}</span>
+            <span className="text-sm text-subtle">{item.ticket.ticketType.name}</span>
           </span>
           <span className="text-right text-sm text-ink-soft">
             {shortDate(item.checkedInAt, event.timezone)}, {time(item.checkedInAt, event.timezone)}

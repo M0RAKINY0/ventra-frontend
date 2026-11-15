@@ -11,6 +11,7 @@ import { EventPage } from "@/pages/EventPage"
 import { HostingPage } from "@/pages/HostingPage"
 import { LandingPage } from "@/pages/LandingPage"
 import { ManageEventPage } from "@/pages/ManageEventPage"
+import { ReservationPage } from "@/pages/ReservationPage"
 import { NotFoundPage } from "@/pages/StatusPages"
 import { TicketPage, TicketsPage } from "@/pages/TicketPages"
 
@@ -36,6 +37,7 @@ const ROUTES: Route[] = [
   { pattern: "/events/:eventId", render: (p) => <EventPage eventId={p.eventId} /> },
   { pattern: "/login", render: () => <LoginPage /> },
   { pattern: "/verify", render: () => <VerifyPage /> },
+  { pattern: "/reservations/:reservationId", render: (p) => <ReservationPage reservationId={p.reservationId} /> },
   { pattern: "/tickets", render: () => <TicketsPage />, auth: true, tabBar: true },
   { pattern: "/tickets/:ticketId", render: (p) => <TicketPage ticketId={p.ticketId} />, auth: true },
   { pattern: "/hosting", render: () => <HostingPage />, auth: true, tabBar: true },

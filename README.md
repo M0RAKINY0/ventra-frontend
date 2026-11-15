@@ -7,13 +7,15 @@ The home page at `/` is the Figma landing page (`src/pages/LandingPage.tsx`, wit
 ## What it does
 
 - Browse published events with search, category and date filters.
-- Reserve one ticket per reservation, then show its QR code at the door.
+- Reserve up to 10 tickets of one type without an account, using a name and email, then show each QR code at the door.
+- Open a reservation from the link in the ticket email (`/reservations/:id?token=...`). No login needed.
+- Optionally sign in from the event page, the confirmation, or the reservation page. A guest reservation then saves to the account and shows under My tickets as well as in the email.
 - Sign up with email and a 6-digit code, log in with email or Google, and sign out.
 - Create draft events, add ticket types, publish, and cancel (Hosting).
 - Check people in by scanning ticket QR codes with the camera, or by pasting the code.
 - Admins can change user roles and cancel any event.
 
-Ventra doesn't take payments. Reserving holds a spot.
+Ventra doesn't take payments. Reserving holds your spots.
 
 ## Run it
 
