@@ -72,6 +72,30 @@ export function money(amount: string | number, currency: string): string {
   }
 }
 
+/** A total for reports. Unlike `money`, zero reads as "NGN 0" and not "Free". */
+export function amount(value: string | number, currency: string): string {
+  const number = typeof value === "string" ? Number(value) : value
+  const safe = Number.isFinite(number) ? number : 0
+  try {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency,
+      currencyDisplay: "code",
+      maximumFractionDigits: safe % 1 === 0 ? 0 : 2,
+    }).format(safe)
+  } catch {
+    return `${currency} ${safe.toLocaleString()}`
+  }
+}
+
+/**
+ * The shareable page for an event. Events from an API without slugs fall
+ * back to the ID route, so old links and old API builds keep working.
+ */
+export function eventPath(event: { id: string; slug?: string | null }): string {
+  return event.slug ? `/e/${encodeURIComponent(event.slug)}` : `/events/${event.id}`
+}
+
 export function lowestPrice(event: Pick<VentraEvent, "ticketTypes" | "currency">): string | null {
   if (event.ticketTypes.length === 0) return null
   const prices = event.ticketTypes.map((type) => Number(type.price))

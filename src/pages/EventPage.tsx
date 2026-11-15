@@ -1,6 +1,7 @@
 import { ArrowLeft, CalendarDays, MapPin, Minus, Plus } from "lucide-react"
 import { useRef, useState, type FormEvent } from "react"
 import { Container, ErrorState, FieldLabel, Loading, Notice, Sheet } from "@/components/common"
+import { ShareLink } from "@/components/ShareLink"
 import { PhotoHero } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
 import {
@@ -24,10 +25,19 @@ import { NotFoundPage } from "@/pages/StatusPages"
 /** Matches the API's limit on tickets per reservation. */
 const MAX_TICKETS = 10
 
-export function EventPage({ eventId }: { eventId: string }) {
-  const event = useAsync((signal) => api.getEvent(eventId, signal), [eventId])
+/**
+ * One event, opened by ID from inside the app or by slug from a shared
+ * /e/:slug link. Pass one of the two.
+ */
+export function EventPage({ eventId, slug }: { eventId?: string; slug?: string }) {
+  const event = useAsync(
+    (signal) => (slug ? api.getEventBySlug(slug, signal) : api.getEvent(eventId ?? "", signal)),
+    [eventId, slug],
+  )
 
-  if (event.error instanceof ApiError && event.error.status === 404) return <NotFoundPage />
+  // A slug the API rejects as malformed (400) is a dead link too.
+  const missing = event.error instanceof ApiError && (event.error.status === 404 || (slug && event.error.status === 400))
+  if (missing) return <NotFoundPage />
 
   return (
     <div className="min-h-screen bg-paper">
@@ -195,6 +205,15 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
           <h2 className="m-0 text-2xl">About this event</h2>
           <p className="m-0 whitespace-pre-line text-[17px] leading-[1.7] text-ink-soft md:text-lg">{event.description}</p>
         </section>
+
+        {event.status === "PUBLISHED" ? (
+          <section aria-labelledby="share-title" className="card flex max-w-3xl flex-col gap-3.5 p-5 md:p-6">
+            <h2 id="share-title" className="m-0 text-[17px]">
+              Share this event
+            </h2>
+            <ShareLink event={event} id="event-share" />
+          </section>
+        ) : null}
       </div>
 
       <aside
@@ -363,6 +382,14 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
               Ventra doesn't take payments yet. Reserving holds your spots.
               {isOwner ? " You're the organizer of this event." : ""}
             </p>
+            {!user ? (
+              <p className="m-0 text-[13px] leading-normal text-subtle">
+                Reserved already?{" "}
+                <Link to="/find-tickets" className="font-semibold text-cobalt">
+                  Find my tickets
+                </Link>
+              </p>
+            ) : null}
           </form>
         )}
       </aside>

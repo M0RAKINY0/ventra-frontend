@@ -1,6 +1,9 @@
 import { ArrowLeft, Check, ImageOff, Trash2 } from "lucide-react"
 import { useMemo, useState, type FormEvent } from "react"
 import { Container, EmptyState, ErrorState, FieldError, FieldLabel, Loading, Notice, Sheet } from "@/components/common"
+import { AttendeesPanel } from "@/components/hosting/AttendeesPanel"
+import { SalesPanel } from "@/components/hosting/SalesPanel"
+import { ShareLink } from "@/components/ShareLink"
 import { SiteHeader } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
 import { isoToZonedLocal, isValidTimeZone, timeZones, zonedLocalToIso } from "@/lib/datetime"
@@ -8,6 +11,7 @@ import {
   CATEGORIES,
   CATEGORY_LABELS,
   errorMessage,
+  eventPath,
   eventStatusLabel,
   longDate,
   money,
@@ -248,7 +252,7 @@ function ManageHeader({
                 {busy ? "Publishing…" : "Publish event"}
               </button>
             ) : (
-              <Link to={`/events/${event.id}`} className="pill pill-light">
+              <Link to={eventPath(event)} className="pill pill-light">
                 View public page
               </Link>
             )}
@@ -299,7 +303,7 @@ function CreateForm() {
 }
 
 function ManageBody({ event, onChange, reload }: { event: VentraEvent; onChange: (next: VentraEvent) => void; reload: () => void }) {
-  const [tab, setTab] = useState<"details" | "tickets" | "checkins">("details")
+  const [tab, setTab] = useState<"details" | "tickets" | "checkins" | "sales" | "attendees">("details")
   const [now] = useState(() => Date.now())
   const locked = event.status !== "DRAFT"
   const hasTypes = event.ticketTypes.length > 0
@@ -326,6 +330,12 @@ function ManageBody({ event, onChange, reload }: { event: VentraEvent; onChange:
           <button type="button" role="tab" aria-selected={tab === "checkins"} onClick={() => setTab("checkins")}>
             Check-ins
           </button>
+          <button type="button" role="tab" aria-selected={tab === "sales"} onClick={() => setTab("sales")}>
+            Sales
+          </button>
+          <button type="button" role="tab" aria-selected={tab === "attendees"} onClick={() => setTab("attendees")}>
+            Attendees
+          </button>
         </div>
         <div role="tabpanel">
           {tab === "details" ? (
@@ -341,11 +351,24 @@ function ManageBody({ event, onChange, reload }: { event: VentraEvent; onChange:
             />
           ) : tab === "tickets" ? (
             <TicketTypesPanel event={event} reload={reload} />
-          ) : (
+          ) : tab === "checkins" ? (
             <CheckInsPanel event={event} />
+          ) : tab === "sales" ? (
+            <SalesPanel event={event} />
+          ) : (
+            <AttendeesPanel event={event} />
           )}
         </div>
       </div>
+
+      {event.status === "PUBLISHED" ? (
+        <aside aria-labelledby="link-title" className="card flex min-w-0 flex-[1_1_300px] flex-col gap-3.5 p-6">
+          <h2 id="link-title" className="m-0 text-[17px]">
+            Your event link
+          </h2>
+          <ShareLink event={event} id="manage-share" stacked />
+        </aside>
+      ) : null}
 
       {event.status === "DRAFT" ? (
         <aside aria-labelledby="ready-title" className="card flex min-w-0 flex-[1_1_300px] flex-col gap-3.5 p-6">

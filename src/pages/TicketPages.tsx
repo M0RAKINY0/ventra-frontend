@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Container, EmptyState, ErrorState, Loading, Sheet, StatusPill, type Tone } from "@/components/common"
 import { PhotoHero, SiteHeader } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
-import { coverFor, longDate, money, shortDate, ticketCode, ticketDisplay, time, timeRange } from "@/lib/format"
+import { coverFor, eventPath, longDate, money, shortDate, ticketCode, ticketDisplay, time, timeRange } from "@/lib/format"
 import { Link } from "@/lib/router"
 import { useSession } from "@/lib/session"
 import { useAsync } from "@/lib/use-async"
@@ -185,7 +185,7 @@ function TicketBody({ ticket }: { ticket: Ticket }) {
               Download QR
             </a>
           ) : null}
-          <Link to={`/events/${event.id}`} className="glass pill text-white">
+          <Link to={eventPath(event)} className="glass pill text-white">
             Event details
           </Link>
         </div>

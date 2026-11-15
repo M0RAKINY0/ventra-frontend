@@ -367,7 +367,8 @@ img {
     background: var(--paper-deep);
   }
 
-  .segmented > button {
+  .segmented > button,
+  .segmented > a {
     flex: 1;
     min-height: 2.75rem;
     padding: 0 1.25rem;
@@ -380,6 +381,15 @@ img {
     white-space: nowrap;
   }
 
+  /* Links work as segments too, for tabs that are separate pages. */
+  .segmented > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  .segmented > a[aria-current="page"],
   .segmented > button[aria-selected="true"],
   .segmented > button[aria-pressed="true"] {
     background: var(--ink);

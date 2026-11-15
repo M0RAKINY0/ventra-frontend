@@ -51,4 +51,30 @@ export const auth = {
   async signOut(): Promise<void> {
     await request(`${AUTH}/sign-out`, { method: "POST", body: {} })
   },
+
+  /**
+   * Emails a reset link that lands on /reset-password with a token. The API
+   * answers the same way whether or not the email has an account.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    const redirectTo = new URL("/reset-password", window.location.origin).toString()
+    await request(`${AUTH}/request-password-reset`, { method: "POST", body: { email, redirectTo } })
+  },
+
+  /** Sets the new password. The API then signs the account out everywhere. */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await request(`${AUTH}/reset-password`, { method: "POST", body: { token, newPassword } })
+  },
+
+  async updateName(name: string): Promise<void> {
+    await request(`${AUTH}/update-user`, { method: "POST", body: { name } })
+  },
+
+  /** Keeps this session and signs out the others. */
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await request(`${AUTH}/change-password`, {
+      method: "POST",
+      body: { currentPassword, newPassword, revokeOtherSessions: true },
+    })
+  },
 }
