@@ -1,5 +1,5 @@
-import { LoaderCircle } from "lucide-react"
-import type { ReactNode } from "react"
+import { Eye, EyeOff, LoaderCircle } from "lucide-react"
+import { useState, type ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { errorMessage } from "@/lib/format"
 
@@ -93,6 +93,45 @@ export function FieldLabel({ htmlFor, children }: { htmlFor: string; children: R
     <label htmlFor={htmlFor} className="text-sm font-semibold text-ink-soft">
       {children}
     </label>
+  )
+}
+
+type PasswordInputProps = {
+  id: string
+  value: string
+  onChange: (value: string) => void
+  autoComplete: "current-password" | "new-password"
+  describedBy?: string
+  invalid?: boolean
+}
+
+/** A password field with a show and hide button, styled like `.field`. */
+export function PasswordInput({ id, value, onChange, autoComplete, describedBy, invalid }: PasswordInputProps) {
+  const [shown, setShown] = useState(false)
+  return (
+    <div className={cn("field flex items-center gap-2 py-0 pr-1.5 focus-within:border-ink", invalid && "border-danger")}>
+      <input
+        id={id}
+        type={shown ? "text" : "password"}
+        autoComplete={autoComplete}
+        required
+        minLength={8}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-describedby={describedBy}
+        aria-invalid={invalid ? true : undefined}
+        className="min-h-12 min-w-0 flex-1 border-0 bg-transparent outline-none"
+      />
+      <button
+        type="button"
+        aria-label={shown ? "Hide password" : "Show password"}
+        aria-pressed={shown}
+        onClick={() => setShown((current) => !current)}
+        className="flex size-11 items-center justify-center rounded-xl border-0 bg-transparent text-subtle hover:text-ink"
+      >
+        {shown ? <EyeOff aria-hidden="true" size={20} /> : <Eye aria-hidden="true" size={20} />}
+      </button>
+    </div>
   )
 }
 

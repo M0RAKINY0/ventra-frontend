@@ -41,6 +41,8 @@ export type TicketType = {
 
 export type VentraEvent = {
   id: string
+  /** Lowercase letters, digits and hyphens. The public page lives at /e/:slug. */
+  slug: string
   title: string
   description: string
   startsAt: string
@@ -130,6 +132,31 @@ export type ReservationInput = {
   items: { ticketTypeId: string; quantity: number }[]
   /** Required for guests. The API ignores it for signed-in buyers. */
   buyer?: { name: string; email: string }
+  /** From the Turnstile widget. Each attempt needs a fresh one, retries included. */
+  turnstileToken?: string
+}
+
+/** Reservation totals for one event. Amounts are decimal strings, like "5000.00". */
+export type SalesSummary = {
+  eventId: string
+  eventStatus: EventStatus
+  currency: string
+  reservationCount: number
+  ticketCount: number
+  reservedValue: string
+  ticketTypes: { id: string; name: string; capacity: number; ticketCount: number; reservedValue: string }[]
+}
+
+/** One ticket in an organizer's attendee list. */
+export type Attendee = {
+  id: string
+  publicId: string
+  status: TicketStatus
+  unitPrice: string
+  createdAt: string
+  ticketType: { name: string }
+  reservation: { id: string; buyerName: string; buyerEmail: string; status: "CONFIRMED" | "CANCELLED" }
+  checkIn: { checkedInAt: string } | null
 }
 
 export type CheckIn = {

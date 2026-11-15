@@ -39,14 +39,29 @@ The interface stays out of the way on frosted panels.
 - Signing in is optional at every step. A guest who signs in afterwards can
   save the reservation to their account, so the tickets live in both the
   email and My tickets.
-- There are no payments. Prices are informational.
+- Every event has a slug, and its public page lives at `/e/:slug`. That is
+  the link organizers share. `/events/:id` opens the same page.
+- A guest who lost the ticket email can ask for the links again at
+  `/find-tickets`. The answer never says whether an email has tickets.
+- There are no payments. Prices are informational. Organizer sales figures
+  add up the price of reserved tickets and say so on the page.
+- Organizers see totals per ticket type, a paged attendee list, and a CSV
+  export for each event they own.
 - Sign-up requires a 6-digit email code before the first sign-in.
 - Drafts are editable. Published events lock their details and ticket types.
 - Cancelling an event leaves ticket rows as they were. The UI treats tickets for
   a cancelled event as void.
 - Cover images are HTTPS links. There's no upload endpoint yet. Events without a
   cover fall back to local category photos in `public/events/`.
-- No password reset or profile editing yet. The API doesn't support them.
+- Password reset goes by emailed link, which expires after 15 minutes and
+  signs the account out everywhere. People change their name and password at
+  `/account`. Email addresses can't be changed yet.
+- `/terms` and `/privacy` are laid out but hold draft text, in
+  `src/content/legal.ts`.
+- Checkout runs a Cloudflare Turnstile check when `VITE_TURNSTILE_SITE_KEY`
+  is set. The API rejects production reservations without its token.
+- Not built yet: payment and payout pages, and an organizer storefront that
+  lists one organizer's events.
 
 ## Brand Commitments
 

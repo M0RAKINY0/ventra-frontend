@@ -3,14 +3,18 @@ import { MobileTabBar } from "@/components/shell"
 import { Loading } from "@/components/common"
 import { RouterProvider, matchPath, useRouter } from "@/lib/router"
 import { SessionProvider, useSession } from "@/lib/session"
+import { AccountPage } from "@/pages/AccountPage"
 import { AdminPage } from "@/pages/AdminPage"
 import { LoginPage, VerifyPage } from "@/pages/AuthPages"
 import { BrowsePage } from "@/pages/BrowsePage"
 import { CheckInPage } from "@/pages/CheckInPage"
 import { EventPage } from "@/pages/EventPage"
+import { FindTicketsPage } from "@/pages/FindTicketsPage"
 import { HostingPage } from "@/pages/HostingPage"
 import { LandingPage } from "@/pages/LandingPage"
+import { PrivacyPage, TermsPage } from "@/pages/LegalPages"
 import { ManageEventPage } from "@/pages/ManageEventPage"
+import { ForgotPasswordPage, ResetPasswordPage } from "@/pages/PasswordPages"
 import { ReservationPage } from "@/pages/ReservationPage"
 import { NotFoundPage } from "@/pages/StatusPages"
 import { TicketPage, TicketsPage } from "@/pages/TicketPages"
@@ -35,8 +39,16 @@ const ROUTES: Route[] = [
   { pattern: "/", render: () => <LandingPage /> },
   { pattern: "/events", render: () => <BrowsePage />, tabBar: true },
   { pattern: "/events/:eventId", render: (p) => <EventPage eventId={p.eventId} /> },
+  // The link organizers share. Same page as above, looked up by slug.
+  { pattern: "/e/:slug", render: (p) => <EventPage slug={p.slug} /> },
   { pattern: "/login", render: () => <LoginPage /> },
   { pattern: "/verify", render: () => <VerifyPage /> },
+  { pattern: "/forgot-password", render: () => <ForgotPasswordPage /> },
+  { pattern: "/reset-password", render: () => <ResetPasswordPage /> },
+  { pattern: "/find-tickets", render: () => <FindTicketsPage /> },
+  { pattern: "/terms", render: () => <TermsPage /> },
+  { pattern: "/privacy", render: () => <PrivacyPage /> },
+  { pattern: "/account", render: () => <AccountPage />, auth: true, tabBar: true },
   { pattern: "/reservations/:reservationId", render: (p) => <ReservationPage reservationId={p.reservationId} /> },
   { pattern: "/tickets", render: () => <TicketsPage />, auth: true, tabBar: true },
   { pattern: "/tickets/:ticketId", render: (p) => <TicketPage ticketId={p.ticketId} />, auth: true },

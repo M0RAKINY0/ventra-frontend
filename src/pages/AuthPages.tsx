@@ -13,7 +13,8 @@ function safeNext(value: string | null): string {
   return value
 }
 
-function AuthLayout({ image, headline, sub, children }: { image: string; headline: string; sub: string; children: ReactNode }) {
+/** Full-screen photo with a headline on it and a form panel. Shared by every signed-out form page. */
+export function AuthLayout({ image, headline, sub, children }: { image: string; headline: string; sub: string; children: ReactNode }) {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-ink">
       <img src={image} alt="" className="absolute inset-0 size-full object-cover" />
@@ -83,6 +84,7 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const verified = search.get("verified") === "1"
+  const passwordReset = search.get("reset") === "1"
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -132,6 +134,7 @@ export function LoginPage() {
         </button>
       </div>
       {verified ? <Notice tone="success">Email confirmed. Log in to continue.</Notice> : null}
+      {passwordReset ? <Notice tone="success">Password changed. Log in with the new one.</Notice> : null}
       <form className="flex flex-col gap-3.5" onSubmit={submit}>
         {mode === "up" ? (
           <div className="flex flex-col gap-1.5">
@@ -187,7 +190,14 @@ export function LoginPage() {
             <span id="auth-password-hint" className="text-[13px] text-subtle">
               At least 8 characters.
             </span>
-          ) : null}
+          ) : (
+            <Link
+              to={`/forgot-password${email.trim() ? `?email=${encodeURIComponent(email.trim())}` : ""}`}
+              className="inline-flex min-h-11 items-center self-start text-sm font-semibold text-cobalt"
+            >
+              Forgot password?
+            </Link>
+          )}
         </div>
         {error ? <Notice tone="danger">{error}</Notice> : null}
         <button type="submit" className="pill pill-dark mt-1 w-full" disabled={busy}>
@@ -201,7 +211,15 @@ export function LoginPage() {
       </div>
       <GoogleButton next={next} />
       <p className="m-0 text-center text-xs leading-relaxed text-subtle">
-        By continuing you agree to Ventra's Terms and Privacy policy.
+        By continuing you agree to Ventra's{" "}
+        <Link to="/terms" className="font-semibold text-ink">
+          Terms
+        </Link>{" "}
+        and{" "}
+        <Link to="/privacy" className="font-semibold text-ink">
+          Privacy policy
+        </Link>
+        .
       </p>
     </AuthLayout>
   )

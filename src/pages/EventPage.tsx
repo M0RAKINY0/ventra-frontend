@@ -1,6 +1,8 @@
 import { ArrowLeft, CalendarDays, MapPin, Minus, Plus } from "lucide-react"
 import { useRef, useState, type FormEvent } from "react"
 import { Container, ErrorState, FieldLabel, Loading, Notice, Sheet } from "@/components/common"
+import { ShareLink } from "@/components/ShareLink"
+import { TurnstileWidget } from "@/components/TurnstileWidget"
 import { PhotoHero } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
 import {
@@ -16,6 +18,7 @@ import {
 } from "@/lib/format"
 import { Link, useRouter } from "@/lib/router"
 import { useSession } from "@/lib/session"
+import { TURNSTILE_SITE_KEY } from "@/lib/turnstile"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
 import type { Reservation, VentraEvent } from "@/types/api"
@@ -24,10 +27,19 @@ import { NotFoundPage } from "@/pages/StatusPages"
 /** Matches the API's limit on tickets per reservation. */
 const MAX_TICKETS = 10
 
-export function EventPage({ eventId }: { eventId: string }) {
-  const event = useAsync((signal) => api.getEvent(eventId, signal), [eventId])
+/**
+ * One event, opened by ID from inside the app or by slug from a shared
+ * /e/:slug link. Pass one of the two.
+ */
+export function EventPage({ eventId, slug }: { eventId?: string; slug?: string }) {
+  const event = useAsync(
+    (signal) => (slug ? api.getEventBySlug(slug, signal) : api.getEvent(eventId ?? "", signal)),
+    [eventId, slug],
+  )
 
-  if (event.error instanceof ApiError && event.error.status === 404) return <NotFoundPage />
+  // A slug the API rejects as malformed (400) is a dead link too.
+  const missing = event.error instanceof ApiError && (event.error.status === 404 || (slug && event.error.status === 400))
+  if (missing) return <NotFoundPage />
 
   return (
     <div className="min-h-screen bg-paper">
@@ -81,6 +93,10 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
   const [reservation, setReservation] = useState<Reservation | null>(null)
   // One key per attempt, so a retry after a network failure can't double-book.
   const idempotencyKey = useRef(crypto.randomUUID())
+  // The API checks a Turnstile token before it holds tickets. A token works
+  // once, so every attempt, retries included, ends by running a new challenge.
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [challenge, setChallenge] = useState(0)
 
   function selectType(ticketTypeId: string) {
     setSelectedId(ticketTypeId)
@@ -103,10 +119,11 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
   const maxQuantity = selected ? Math.min(MAX_TICKETS, remaining(selected)) : 0
   const canReserve = Boolean(!isAdmin && !cancelled && !draft && selected && maxQuantity > 0)
   const total = selected ? money(Number(selected.price) * quantity, event.currency) : null
+  const awaitingCheck = Boolean(TURNSTILE_SITE_KEY) && !turnstileToken
 
   async function reserve(submitEvent: FormEvent<HTMLFormElement>) {
     submitEvent.preventDefault()
-    if (!selected || !canReserve) return
+    if (!selected || !canReserve || awaitingCheck) return
     setBusy(true)
     setError(null)
     try {
@@ -116,6 +133,7 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
           items: [{ ticketTypeId: selected.id, quantity }],
           // Signed-in buyers reserve under their account.
           buyer: user ? undefined : { name: guestName, email: guestEmail },
+          turnstileToken: turnstileToken ?? undefined,
         },
         idempotencyKey.current,
       )
@@ -131,17 +149,28 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
       }
     } finally {
       setBusy(false)
+      if (TURNSTILE_SITE_KEY) {
+        setTurnstileToken(null)
+        setChallenge((count) => count + 1)
+      }
     }
   }
 
   // Both buttons submit the same form, so the mobile bar also validates the guest fields.
   const reserveAction = (
-    <button type="submit" form="reserve-form" className="pill pill-dark w-full" disabled={!canReserve || busy}>
+    <button
+      type="submit"
+      form="reserve-form"
+      className="pill pill-dark w-full"
+      disabled={!canReserve || busy || awaitingCheck}
+    >
       {busy
         ? "Reserving…"
         : cancelled
           ? "Reservations closed"
-          : total
+          : canReserve && awaitingCheck
+            ? "Checking…"
+            : total
             ? `Reserve ${quantity > 1 ? `${quantity} ` : ""}· ${total}`
             : "Reserve"}
     </button>
@@ -195,6 +224,15 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
           <h2 className="m-0 text-2xl">About this event</h2>
           <p className="m-0 whitespace-pre-line text-[17px] leading-[1.7] text-ink-soft md:text-lg">{event.description}</p>
         </section>
+
+        {event.status === "PUBLISHED" ? (
+          <section aria-labelledby="share-title" className="card flex max-w-3xl flex-col gap-3.5 p-5 md:p-6">
+            <h2 id="share-title" className="m-0 text-[17px]">
+              Share this event
+            </h2>
+            <ShareLink event={event} id="event-share" />
+          </section>
+        ) : null}
       </div>
 
       <aside
@@ -354,6 +392,15 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
               </div>
             ) : null}
 
+            {canReserve && TURNSTILE_SITE_KEY ? (
+              <TurnstileWidget
+                siteKey={TURNSTILE_SITE_KEY}
+                action="checkout"
+                resetKey={challenge}
+                onToken={setTurnstileToken}
+              />
+            ) : null}
+
             {error ? <Notice tone="danger">{error}</Notice> : null}
             {isAdmin ? (
               <p className="m-0 text-sm text-subtle">Admin accounts can't reserve tickets. Use a regular account.</p>
@@ -363,6 +410,14 @@ function EventBody({ event, onChanged }: { event: VentraEvent; onChanged: () => 
               Ventra doesn't take payments yet. Reserving holds your spots.
               {isOwner ? " You're the organizer of this event." : ""}
             </p>
+            {!user ? (
+              <p className="m-0 text-[13px] leading-normal text-subtle">
+                Reserved already?{" "}
+                <Link to="/find-tickets" className="font-semibold text-cobalt">
+                  Find my tickets
+                </Link>
+              </p>
+            ) : null}
           </form>
         )}
       </aside>

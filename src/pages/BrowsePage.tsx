@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { Container, EmptyState, ErrorState, Loading, Sheet } from "@/components/common"
 import { SiteHeader } from "@/components/shell"
 import { api, type EventQuery } from "@/lib/api"
-import { CATEGORIES, CATEGORY_LABELS, coverFor, lowestPrice, shortDate, spotsLeft, time } from "@/lib/format"
+import { CATEGORIES, CATEGORY_LABELS, coverFor, eventPath, lowestPrice, shortDate, spotsLeft, time } from "@/lib/format"
 import { Link } from "@/lib/router"
 import { useAsync } from "@/lib/use-async"
 import { cn } from "@/lib/utils"
@@ -104,7 +104,7 @@ export function BrowsePage() {
               <h1 className="m-0 font-display text-[clamp(36px,6vw,84px)] leading-[0.98] tracking-tight">{hero.title}</h1>
               <p className="m-0 line-clamp-2 max-w-xl text-lg leading-relaxed text-white/85">{hero.description}</p>
               <div className="mt-1 flex flex-wrap items-center gap-4">
-                <Link to={`/events/${hero.id}`} className="pill pill-light min-h-[54px] px-7 text-base">
+                <Link to={eventPath(hero)} className="pill pill-light min-h-[54px] px-7 text-base">
                   See tickets
                   <ArrowRight aria-hidden="true" size={18} />
                 </Link>
@@ -260,7 +260,7 @@ function EventTile({ event }: { event: VentraEvent }) {
 
   return (
     <Link
-      to={`/events/${event.id}`}
+      to={eventPath(event)}
       className="group relative block aspect-[4/3] overflow-hidden rounded-[26px] bg-ink text-white no-underline md:aspect-[3/4]"
     >
       <img

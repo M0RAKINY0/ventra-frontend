@@ -1,4 +1,4 @@
-import { CalendarDays, Compass, LogOut, ScanLine, ShieldCheck, Ticket } from "lucide-react"
+import { CalendarDays, Compass, LogOut, ScanLine, ShieldCheck, Ticket, UserRound } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Link, useRouter } from "@/lib/router"
 import { useSession } from "@/lib/session"
@@ -74,9 +74,13 @@ function AccountButton() {
         <div className="absolute right-0 top-14 z-30 w-64 rounded-3xl border border-line bg-white p-4 text-ink shadow-xl">
           <p className="m-0 font-bold">{user.name}</p>
           <p className="m-0 truncate text-sm text-subtle">{user.email}</p>
+          <Link to="/account" className="pill pill-soft mt-4 w-full" onClick={() => setOpen(false)}>
+            <UserRound aria-hidden="true" size={16} />
+            Profile
+          </Link>
           <button
             type="button"
-            className="pill pill-soft mt-4 w-full"
+            className="pill pill-soft mt-2 w-full"
             onClick={async () => {
               setOpen(false)
               await signOut()

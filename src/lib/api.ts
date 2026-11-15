@@ -1,4 +1,5 @@
 import type {
+  Attendee,
   CheckIn,
   EventCategory,
   EventInput,
@@ -6,6 +7,7 @@ import type {
   Reservation,
   ReservationInput,
   Role,
+  SalesSummary,
   Ticket,
   TicketType,
   TicketTypeInput,
@@ -62,7 +64,8 @@ export async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, code, message, source.details)
 }
 
-export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+/** Sends the request with the session cookie. Throws `ApiError` for network failures and non-2xx responses. */
+async function send(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = { Accept: "application/json", ...options.headers }
   if (options.body !== undefined) headers["Content-Type"] = "application/json"
 
@@ -81,6 +84,17 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 
   if (!response.ok) throw await toApiError(response)
+  return response
+}
+
+/** Fetches a file, such as a CSV export, as a Blob. */
+export async function download(path: string, accept: string): Promise<Blob> {
+  const response = await send(path, { headers: { Accept: accept } })
+  return response.blob()
+}
+
+export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const response = await send(path, options)
   if (response.status === 204) return undefined as T
 
   const payload = (await response.json()) as unknown
@@ -118,6 +132,12 @@ export const api = {
 
   getEvent: (eventId: string, signal?: AbortSignal) =>
     request<{ event: VentraEvent }>(`/api/v1/events/${eventId}`, { signal }).then((r) => r.event),
+
+  /** The public lookup behind /e/:slug. Drafts and cancelled events need the owner or an admin. */
+  getEventBySlug: (slug: string, signal?: AbortSignal) =>
+    request<{ event: VentraEvent }>(`/api/v1/events/by-slug/${encodeURIComponent(slug)}`, { signal }).then(
+      (r) => r.event,
+    ),
 
   createEvent: (input: EventInput) =>
     request<{ event: VentraEvent }>("/api/v1/events", { method: "POST", body: input }).then((r) => r.event),
@@ -164,6 +184,13 @@ export const api = {
       body: { token },
     }).then((r) => r.reservation),
 
+  /**
+   * Emails every reservation link for this address. The API answers the same
+   * way whether or not the email has reservations, so nothing leaks here.
+   */
+  recoverTickets: (email: string) =>
+    request<{ message: string }>("/api/v1/reservations/recover", { method: "POST", body: { email } }),
+
   listTickets: (signal?: AbortSignal) =>
     request<{ tickets: Ticket[] }>("/api/v1/me/tickets", { signal }).then((r) => r.tickets),
 
@@ -178,6 +205,16 @@ export const api = {
 
   listCheckIns: (eventId: string, signal?: AbortSignal) =>
     request<{ checkIns: CheckIn[] }>(`/api/v1/events/${eventId}/check-ins`, { signal }).then((r) => r.checkIns),
+
+  /** Owner or admin only. Totals count confirmed reservations, not collected money. */
+  eventSales: (eventId: string, signal?: AbortSignal) =>
+    request<{ summary: SalesSummary }>(`/api/v1/events/${eventId}/sales`, { signal }).then((r) => r.summary),
+
+  /** Owner or admin only. One row per ticket. */
+  listAttendees: (eventId: string, params: { page?: number; pageSize?: number } = {}, signal?: AbortSignal) =>
+    request<Paginated<Attendee>>(`/api/v1/events/${eventId}/attendees${query(params)}`, { signal }),
+
+  attendeesCsv: (eventId: string) => download(`/api/v1/events/${eventId}/attendees.csv`, "text/csv"),
 
   listUsers: (params: { query?: string; role?: Role; page?: number; pageSize?: number } = {}, signal?: AbortSignal) =>
     request<Paginated<User>>(`/api/v1/users${query(params)}`, { signal }),

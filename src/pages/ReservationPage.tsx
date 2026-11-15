@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Container, ErrorState, Loading } from "@/components/common"
 import { SiteHeader } from "@/components/shell"
 import { ApiError, api } from "@/lib/api"
-import { coverFor, errorMessage, longDate, reservationPath, ticketCode, ticketDisplay, timeRange } from "@/lib/format"
+import { coverFor, errorMessage, eventPath, longDate, reservationPath, ticketCode, ticketDisplay, timeRange } from "@/lib/format"
 import { Link, useRouter } from "@/lib/router"
 import { useSession } from "@/lib/session"
 import { useAsync } from "@/lib/use-async"
@@ -181,7 +181,7 @@ function ReservationBody({ reservation, account }: { reservation: Reservation; a
           We emailed {count === 1 ? "this ticket" : "these tickets"} to {reservation.buyerEmail}. That email links back
           to this page, so keep it until the event.
         </p>
-        <Link to={`/events/${event.id}`} className="glass pill self-start text-white">
+        <Link to={eventPath(event)} className="glass pill self-start text-white">
           Event details
         </Link>
         {account}
