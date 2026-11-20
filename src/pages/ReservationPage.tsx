@@ -26,6 +26,7 @@ export function ReservationPage({ reservationId }: { reservationId: string }) {
   )
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [resetMessage, setResetMessage] = useState<string | null>(null)
   const { setData } = reservation
 
   const data = reservation.data
@@ -60,6 +61,10 @@ export function ReservationPage({ reservationId }: { reservationId: string }) {
   // A bad ID fails validation with 400. Either way there is nothing to show.
   if (reservation.error instanceof ApiError && [400, 404].includes(reservation.error.status)) return <NotFoundPage />
 
+  // Links die 30 days after the event. The buyer can still get fresh ones by email.
+  const expired = reservation.error instanceof ApiError && reservation.error.status === 410
+  const canReset = Boolean(data && (token || (user && data.userId === user.id)))
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-ink text-white">
       {data ? (
@@ -68,13 +73,21 @@ export function ReservationPage({ reservationId }: { reservationId: string }) {
       <span aria-hidden="true" className="absolute inset-0 bg-[rgba(10,16,14,0.58)]" />
       <SiteHeader />
       <Container className="on-photo relative pb-28 pt-4 md:pb-16 md:pt-10">
-        {reservation.error ? (
+        {expired ? (
+          <LinkNotice title="This link has expired">
+            Ticket links stop working 30 days after the event. Enter your email and we'll send links for anything
+            still current.
+          </LinkNotice>
+        ) : resetMessage ? (
+          <LinkNotice title="Link reset">{resetMessage}</LinkNotice>
+        ) : reservation.error ? (
           <ErrorState error={reservation.error} onRetry={reservation.reload} className="text-ink" />
         ) : !data ? (
           <Loading label="Loading your tickets" className="text-white/80" />
         ) : (
           <ReservationBody
             reservation={data}
+            reset={canReset ? <ResetLinkPanel reservationId={reservationId} token={token} onDone={setResetMessage} /> : null}
             account={
               <AccountPanel
                 reservation={data}
@@ -163,7 +176,89 @@ function AccountPanel({
   )
 }
 
-function ReservationBody({ reservation, account }: { reservation: Reservation; account: ReactNode }) {
+/** Full-page message in place of the tickets, with the way back to them. */
+function LinkNotice({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex max-w-xl flex-col gap-4">
+      <h1 className="m-0 font-display text-[clamp(32px,5vw,56px)] leading-none tracking-tight">{title}</h1>
+      <p className="m-0 leading-relaxed text-white/85">{children}</p>
+      <Link to="/find-tickets" className="pill pill-light self-start">
+        Find my tickets
+      </Link>
+    </div>
+  )
+}
+
+/**
+ * For a link that went somewhere it shouldn't. Resetting kills every old
+ * link and emails a new one to the buyer, so whoever else has it loses access.
+ */
+function ResetLinkPanel({
+  reservationId,
+  token,
+  onDone,
+}: {
+  reservationId: string
+  token: string | null
+  onDone: (message: string) => void
+}) {
+  const [confirming, setConfirming] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function reset() {
+    setResetting(true)
+    setError(null)
+    try {
+      const { message } = await api.resetReservationLink(reservationId, token)
+      onDone(message)
+    } catch (caught) {
+      setError(errorMessage(caught))
+      setResetting(false)
+    }
+  }
+
+  if (!confirming) {
+    return (
+      <button type="button" className="self-start text-sm font-semibold text-white/85 underline" onClick={() => setConfirming(true)}>
+        Shared this link by mistake? Reset it
+      </button>
+    )
+  }
+
+  return (
+    <div className="glass flex max-w-xl flex-col gap-3 rounded-[24px] p-5">
+      <span className="font-semibold">Reset this link?</span>
+      <span className="text-white/85">
+        Every old link to these tickets stops working, including this one. We'll email a new link to the address used
+        at checkout.
+      </span>
+      {error ? (
+        <span role="alert" className="text-sm font-semibold">
+          {error}
+        </span>
+      ) : null}
+      <div className="flex flex-wrap gap-3">
+        <button type="button" className="pill pill-light" disabled={resetting} onClick={reset}>
+          {resetting ? "Resetting…" : "Reset link"}
+        </button>
+        <button type="button" className="glass pill text-white" disabled={resetting} onClick={() => setConfirming(false)}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ReservationBody({
+  reservation,
+  account,
+  reset,
+}: {
+  reservation: Reservation
+  account: ReactNode
+  reset: ReactNode
+}) {
   const event = reservation.event
   const count = reservation.tickets.length
 
@@ -185,6 +280,7 @@ function ReservationBody({ reservation, account }: { reservation: Reservation; a
           Event details
         </Link>
         {account}
+        {reset}
       </div>
 
       <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-5 p-0">

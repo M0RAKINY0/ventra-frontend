@@ -185,6 +185,16 @@ export const api = {
     }).then((r) => r.reservation),
 
   /**
+   * Kills every link to the reservation and emails a fresh one to the buyer.
+   * Guests send their link's token. Signed-in owners can send none.
+   */
+  resetReservationLink: (reservationId: string, token: string | null) =>
+    request<{ message: string }>(`/api/v1/reservations/${encodeURIComponent(reservationId)}/reset-link`, {
+      method: "POST",
+      body: token ? { token } : {},
+    }),
+
+  /**
    * Emails every reservation link for this address. The API answers the same
    * way whether or not the email has reservations, so nothing leaks here.
    */
